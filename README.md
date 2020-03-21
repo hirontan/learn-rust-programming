@@ -493,3 +493,114 @@ fn main() {
 ```
 $ cargo doc --open
 ```
+
+## 3. Common Programming Concepts
+
+### 変数と可変性
+
+##### 準備
+```
+$ cargo new variables
+$ cd variables
+```
+
+##### `src/main.rs`の編集
+```
+fn main() {
+    let x = 5;
+    println!("The value of x is: {}", x);
+    x = 6;
+    println!("The value of x is: {}", x);
+}
+```
+
+##### 実行してみるとエラーが出る
+- 不変変数`x`（immutable）に2回代入してはならない
+- コンパイル時にエラーが出る
+- 値の変化しない変数はわかるようになる
+- 変数はデフォルト不変変数
+```
+$ cargo run
+   Compiling variables v0.1.0
+error[E0384]: cannot assign twice to immutable variable `x`
+ --> src/main.rs:4:5
+  |
+2 |     let x = 5;
+  |         -
+  |         |
+  |         first assignment to `x`
+  |         help: make this binding mutable: `mut x`
+3 |     println!("The value of x is: {}", x);
+4 |     x = 6;
+  |     ^^^^^ cannot assign twice to immutable variable
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0384`.
+error: could not compile `variables`.
+
+To learn more, run the command again with --verbose.
+```
+
+##### 可変変数を利用する
+- `src/main.rs`の編集
+```
+fn main() {
+    let mut x = 5;
+    println!("The value of x is: {}", x);
+    x = 6;
+    println!("The value of x is: {}", x);
+}
+```
+
+##### 変数と定数の違い
+- mutを定数とともに使用することは許可されてない
+- 定数はデフォルトでは不変であるだけでなく、常に不変
+- `let`の代わりに`const`キーワードを使用して定数を宣言
+- 値の型に注釈を付ける必要がある
+- 定数の命名規則は、大文字 + アンダースコアで構成
+
+```
+const MAX_POINTS: u32 = 100_000;
+fn main() {
+    let mut x = 5;
+    println!("The value of x is: {}", x);
+    x = 6;
+    println!("The value of x is: {}", x);
+    println!("The value of MAX_POINTS is: {}", MAX_POINTS);
+}
+```
+
+##### シャドーイング
+- 既存の変数と同名の変数を定義して、そのスコープで既存の変数にアクセスできなくする
+- `let`を繰り返し利用することで可能
+
+```
+const MAX_POINTS: u32 = 100_000;
+fn main() {
+    let mut x = 5;
+    println!("The value of x is: {}", x);
+    x = 6;
+    println!("The value of x is: {}", x);
+    println!("The value of MAX_POINTS is: {}", MAX_POINTS);
+
+
+    let x = x + 1;
+
+    let x = x * 2;
+    println!("The value of x is: {}", x);
+}
+```
+
+- letキーワードを再度使用すると効果的に新しい変数を作成する
+```
+    let spaces = "   ";
+    let spaces = spaces.len();
+    println!("The value of x is: {}", spaces);
+
+    // 実行不可
+    let mut spaces = "   ";
+    spaces = spaces.len();
+```
+
+
