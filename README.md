@@ -603,4 +603,135 @@ fn main() {
     spaces = spaces.len();
 ```
 
+### データ型
+- コンパイル時にすべての変数の型を知っている
+- コンパイラは使用するタイプを推測している
 
+##### スカラー型
+- 整数、浮動小数点数、ブール値、文字
+
+- 整数型
+  - 符号あり(Signed)と符号なし(Unsigned)がある
+  - ex)
+    - i8: -128〜127
+    - u8: 0〜255
+  - 視覚的な区切り文字として「_(アンダースコア)」を使用できる
+
+| Length | Signed | Unsigned |
+|:------:|:------:|:--------:|
+| 8-bit | i8 | u8 |
+| 16-bit | i16 | u16 |
+| 32-bit | i32 | u32 |
+| 64-bit | i64 | u64 |
+| 128-bit | i128 | u128 |
+| arch | isize | usize |
+
+  - 整数リテラル
+
+| Number literals | Example |
+|:---------------:|:-------:|
+| Decimal | 98_222 |
+| Hex | 0xff |
+| Octal | 0o77 |
+| Binary | 0b1111_0000 |
+| Byte (u8 only) | b'A' |
+
+- 浮動小数点型
+  - f32とf64がある
+  - デフォルトはf64
+
+```
+fn main() {
+    let x = 2.0; // f64
+
+    let y: f32 = 3.0; // f32
+}
+```
+
+- 数値演算
+
+```
+fn main() {
+    // addition
+    let sum = 5 + 10;
+
+    // subtraction
+    let difference = 95.5 - 4.3;
+
+    // multiplication
+    let product = 4 * 30;
+
+    // division
+    let quotient = 56.7 / 32.2;
+
+    // remainder
+    let remainder = 43 % 5;
+}
+```
+
+- ブール型
+  - ブール値のサイズは1バイト
+
+```
+fn main() {
+    let t = true;
+
+    let f: bool = false; // with explicit type annotation
+}
+```
+
+- キャラクター型
+  - char型のサイズは4バイトであり、Unicodeスカラー値を表す
+  - Unicodeスカラー値の範囲は、U+0000〜U+D7FFおよびU+E000〜U+10FFFF
+
+```
+fn main() {
+    let c = 'z';
+    let z = 'ℤ';
+    let heart_eyed_cat = '😻';
+}
+```
+
+##### 複合型
+- 複数の値を1つの型にグループ化できる
+- タプルと配列という2つのプリミティブな複合型がある
+
+- タプル型
+  - さまざまな型の多数の値を1つの複合型にグループ化できる
+  - タプルから個々の値を取得するには、パターンマッチングを使用してタプル値を非構造化する
+  - ピリオド（.）に続いてアクセスする値のインデックスを使用して、タプル要素に直接アクセスできる
+    - タプルの最初のインデックスは0
+
+```
+fn main() {
+    let tup: (i32, f64, u8) = (500, 6.4, 1);
+    let (x, y, z) = tup;
+    println!("The value of y is: {}", y);
+    println!("The value of tup.1 is: {}", tup.1);
+}
+```
+
+- 配列型
+  - 配列のすべての要素は同じ型の必要がある
+  - タプルのように固定長（他の言語と違うところ）
+  - データをヒープではなくスタックに割り当てる、または常に要素の数を固定したい場合に役立つ
+    - 配列はベクター型ほど柔軟でない
+    - ベクターは標準ライブラリによって提供され、サイズの拡大縮小ができる
+      - 配列かベクターか利用を迷う場合は、ベクターを利用することになりそう
+  - 要素のタイプ、配列内の要素数を[]内に指定できる
+  - 初期値を指定し、その後にセミコロンを指定すると、同じ値が入力される
+  - []内にインデックスを入力することでアクセスできる
+  - もし配列数を超えて、数値指定した場合、エラーになる
+```
+fn main() {
+    let a: [i32; 5] = [1, 2, 3, 4, 5];
+    println!("The value of a[1] is: {}", a[1]);
+
+    let months = ["January", "February", "March", "April", "May", "June", "July",
+              "August", "September", "October", "November", "December"];
+    println!("The value of months[1] is: {}", months[1]);
+
+    let a = [3; 5];
+    println!("The value of a[1] is: {}", a[1]);
+}
+```
