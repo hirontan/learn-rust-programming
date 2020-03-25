@@ -735,3 +735,66 @@ fn main() {
     println!("The value of a[1] is: {}", a[1]);
 }
 ```
+
+### 関数
+- スネークケースで命名
+
+```
+fn main() {
+    another_function();
+}
+
+fn another_function() {
+    println!("Another function.");
+}
+```
+
+##### パラメータ（引数）
+- `x`パラメータ
+  - 必須：型を指定する`i32`
+```
+fn main() {
+    another_function(5);
+}
+
+fn another_function(x: i32) {
+    println!("The value of x is: {}", x);
+}
+```
+
+##### 関数本体にはステートメントと式がある
+- ステートメントは値を返さない
+  - letステートメントを別の変数に割り当てることはできません
+  - CやRubyなどでは、`x = y = 6` で x と y 両方に 6 を割り当てられるが、Rustは割り当てられない
+
+```
+fn main() {
+    let x = (let y = 6); # → letステートメントで別の変数を割り当てている。Rustではエラーになる。
+}
+```
+
+- 式はステートメントの一部にすることができる
+- ブロック{}はletステートメントで扱える。
+
+```
+fn main() {
+    let y = {
+        let x = 3;
+        x + 1
+    };
+}
+```
+
+##### 戻り値を持つ関数
+- `->` の後に型を宣言
+- 最後の式を暗黙的に返す
+  - returnキーワードを使用して値を指定することもできる
+```
+fn main() {
+    plus_one(5);
+}
+
+fn plus_one(x: i32) -> i32 {
+    x + 1
+}
+```
