@@ -799,8 +799,131 @@ fn plus_one(x: i32) -> i32 {
 }
 ```
 
-##### コメント
+### コメント
 - `//` でコメントになる
 - 各行でコメントをしたい場合は、複数行で扱う
 
+### 制御フロー
+- 条件が真かどうかに応じてコードを実行するかどうかを決定すること
 
+##### `if`
+- 条件に応じてコードを分岐できる
+- `bool`でないとエラーが出る
+
+```
+fn main() {
+    let number = 3;
+    use_if(number);
+}
+
+
+fn use_if(number: i32) {
+    if number < 5 {
+        println!("condition was true");
+    } else {
+        println!("condition was false");
+    }
+}
+```
+
+##### `else if`で複数の条件
+- 最初の真の条件に対してのみブロックを実行し、残りのチェックも行わない
+```
+fn main() {
+    let number = 3;
+    use_elseif(number);
+}
+
+fn use_elseif(number: i32) {
+    if number % 4 == 0 {
+        println!("number is divisible by 4");
+    } else if number % 3 == 0 {
+        println!("number is divisible by 3");
+    } else if number % 2 == 0 {
+        println!("number is divisible by 2");
+    } else {
+        println!("number is not divisible by 4, 3, or 2");
+    }
+}
+```
+
+##### letステートメントでifを使用
+- 変数は、if式の結果に基づいて値にバインドされる
+- ifの各アームからの結果である可能性がある値は、同じ型であること
+  - コードのブロックは最後の式で評価
+```
+fn main() {
+    let condition = true;
+    let number = if condition {
+        5
+    } else {
+        6
+    };
+
+    println!("The value of number is: {}", number);
+}
+```
+
+##### ループによる繰り返し
+- loop、while、forの3種類のループがある
+
+
+- `loop`
+  - ループを停止するために使用する`break`の後に、戻りたい値を追加できる
+
+```
+fn main() {
+    let mut counter = 0;
+
+    let result = loop {
+        counter += 1;
+
+        if counter == 10 {
+            break counter * 2;
+        }
+    };
+
+    println!("The result is {}", result);
+}
+```
+
+- `while` を使用した条件付きループ
+  - 条件が真でなくなると、`break`を呼び出し、ループを停止
+  - if、else、breakの組み合わせ実装もできる
+
+##### whileで、コレクションの要素をループ
+- `for`と比べて、すべての要素の条件チェックを実行するため、処理が遅くなる
+```
+fn main() {
+    let a = [10, 20, 30, 40, 50];
+    let mut index = 0;
+
+    while index < 5 {
+        println!("the value is: {}", a[index]);
+
+        index += 1;
+    }
+}
+```
+
+##### forでコレクションをループする
+- コードを特定の回数実行する必要がある場合、forを利用する
+```
+fn main() {
+    let a = [10, 20, 30, 40, 50];
+
+    for element in a.iter() {
+        println!("the value is: {}", element);
+    }
+}
+```
+
+- revを使用して、反転させることも可能
+```
+fn main() {
+    for number in (1..4).rev() {
+        println!("{}!", number);
+    }
+    println!("LIFTOFF!!!");
+}
+```
