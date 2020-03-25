@@ -927,3 +927,233 @@ fn main() {
     println!("LIFTOFF!!!");
 }
 ```
+
+## Understanding Ownership（所有権）
+- ガベージコレクタを必要とせずにメモリの安全性を保証できる
+- 所有権といくつかの関連機能について説明
+  - メモリの貸し借り
+  - スライス
+
+### What Is Ownership?
+- すべてのプログラムは、実行中にコンピュータのメモリを使用する方法を管理する必要がある
+  - 一部の言語では、プログラムの実行時に使用されなくなったメモリを探すガベージコレクションがある
+  - それ以外は、明示的にメモリを割り当てて解放する必要がある
+- Rustは、コンパイラーがコンパイル時にチェックし一連のルールを持って所有権の仕組みを通じて管理
+  - 所有権機能は、プログラム実行中に速度を低下させることはない。
+- 所有権のルールに慣れれば、安全で効率的なコードを自然に開発できるようになる
+
+##### スタックとヒープ
+- 多くのプログラミング言語は、スタックとヒープについて頻繁に考える必要はない
+- Rustのようなシステムプログラミング言語は、値がスタックかヒープかを考える
+- スタックは値を取得した順序で格納し、逆の順序で値を削除する。後入れ先出し
+  - データの追加はスタックへのプッシュと呼ぶ
+  - データの削除はスタックからのポップと呼ぶ
+- スタックに格納されるすべてのデータは、既知の固定サイズでなければならない
+  - コンパイル時に不明なサイズまたは変更される可能性のあるサイズのデータは、代わりにヒープに格納する必要がある
+  - ヒープはデータ整理がされていない
+  - ヒープにデータを配置すると、一定量のスペースが要求される
+  - ヒープ内の十分な空の場所を見つけ、使用中としてマークし、その場所のアドレスであるポインタを返す
+    - このプロセスはヒープ上での割り当てと呼ばれる
+  - 実際のデータが必要な場合は、ポインタに従う必要がある
+- 格納
+  - スタックへのプッシュは、OSが新しいデータの格納場所を探す必要がないため、ヒープに割り当てるよりも高速
+  - ヒープへの割り当ては、最初にデータを保持するのに十分なスペースを見つけてから、次の割り当てに備えて実行する必要があるため、多くのプロセスが必要
+- アクセス
+  - ヒープ内のデータへのアクセスは、スタック上のデータへのアクセスよりも遅い
+    - ポインターに従う必要があるため
+- 所有者が対処する問題
+  - コードのどの部分がヒープ上のどのデータを使用しているかを追跡し、ヒープ上の重複データの量を最小限に抑え、スペースが不足しないようにヒープ上の未使用のデータをクリーンアップすること
+  - 所有権を理解したら、スタックとヒープについて頻繁に考える必要はない
+  - ただし、ヒープデータを管理することが所有権が存在する理由であることを理解すること
+
+##### 所有権のルール
+- 各値には、その所有者と呼ばれる変数がある
+- 一度に所有者は1人
+- 所有者が範囲外になると、値は削除される
+
+##### 変数のスコープ
+- スコープと変数が有効なときの関係は、他のプログラミング言語と同様
+
+##### 文字列型
+- 文字列リテラルは便利ですが、テキストを使用したいすべての状況に適しているわけではない
+  - 理由その１：不変であること
+  - 理由その２：コードを作成するときにすべての文字列値がわかるわけではないこと
+
+- 2番目の文字列型String
+  - ヒープに割り当てられるため、コンパイル時に不明なテキストを格納できる
+  - from関数を扱う
+
+```
+let mut s = String::from("hello");
+
+s.push_str(", world!"); // push_str() appends a literal to a String
+
+println!("{}", s); // This will print `hello, world!`
+``` 
+
+##### メモリと割り当て
+- 文字列リテラルが高速で効率的
+  - 文字列リテラルの場合、コンパイル時に内容がわかるため、テキストは最終的な実行可能ファイルに直接ハードコードされる
+  - ただし、これらのプロパティは、文字列リテラルの不変性に由来する
+  - コンパイル時にサイズが不明であり、プログラムの実行中にサイズが変化する可能性があるテキストの各部分について、メモリの塊をバイナリに入れることはできない
+- String型の場合、可変で拡張可能なテキストを保持するために、コンパイル時に不明な量のメモリをヒープに割り当てる必要がある
+  - 実行時にオペレーティングシステムからメモリを要求する必要がある
+    - `String:: from`を呼び出すと、その実装は必要なメモリを要求します。 これはプログラミング言語ではほぼ普遍的。
+  - 文字列を使い終わったら、このメモリをオペレーティングシステムに戻す必要がある
+    - ガベージコレクター（GC）を備えた言語では、GCは追跡し、使用されなくなったメモリをクリーンアップするため、考える必要はない
+    - GCがなければ、メモリが使用されなくなったときを識別し、コードを呼び出して明示的に行う必要がある
+      - 歴史的に難しいプログラミング問題
+      - 忘れてしまうとメモリを無駄にする
+      - 早すぎると、変数が無効になる
+      - 1つの割り当てと1つの空きをペアにする必要がある
+- Rustはメモリを所有する変数がスコープ外になると、メモリは自動的に返される
+```
+    {
+        let s = String::from("hello"); // s is valid from this point forward
+
+        // do stuff with s
+        println!("{}", s);
+    }                              // this scope is now over, and s is no
+                                   // longer valid
+```
+- 変数がスコープ外になると、特別な関数ドロップを呼び出す
+  - 注：C ++では、アイテムの有効期間の終わりにリソースを割り当て解除するこのパターンは、リソース獲得は初期化（RAII）と呼ばれることがあります。 Rustのドロップ機能は、RAIIパターンを使用したことがあればおなじみです。
+
+##### 変数とデータが相互作用する方法：移動
+```
+let x = 5;
+let y = x;
+```
+- 複数の変数が同じデータと異なる方法で相互作用できる
+- 整数は既知の固定サイズの値であり、これら2つの5の値はスタックにプッシュされる
+
+
+```
+let s1 = String::from("hello");
+let s2 = s1;
+```
+- 前のコードと非常によく似ているので、動作方法は同じであると想定できるが、同じ動きをしない
+- 文字列は、ポインタ・長さ・容量で構成されている。この三つは、スタックに格納される
+- s1をs2に割り当てると、文字列データがコピーされる。スタック上にあるポインター・長さ・容量がコピーされる。ポインターが参照するヒープ上のデータはコピーしない
+
+```
+let s1 = String::from("hello");
+let s2 = s1;
+
+println!("{}, world!", s1);
+```
+- ダブルフリーエラー
+  - 変数がスコープ外になると、自動的にdrop関数を呼び出し、その変数のヒープメモリをクリーンアップするため、同じ場所を指す両方のデータポインターを示している場合、同じメモリを開放しようとしてしまうこと
+  - メモリを2回解放すると、メモリの破損につながり、セキュリティの脆弱性につながる可能性がある
+- 他の言語を使用しているときに浅いコピーと深いコピーという用語を聞いた場合、データをコピーせずにポインタ、長さ、容量をコピーするという概念は、浅いコピーを作成するように聞こえる
+  - Rustは最初の変数も無効にするため、浅いコピーと呼ばれるのではなく、移動と呼ぶ
+  - データの「深い」コピーを自動的に作成することはありません
+
+##### 変数とデータが相互作用する方法：クローン
+```
+let s1 = String::from("hello");
+let s2 = s1.clone();
+
+println!("s1 = {}, s2 = {}", s1, s2);
+```
+- スタックデータだけでなく、文字列のヒープデータを深くコピーしたい場合は、クローンと呼ばれる一般的なメソッドを使用できる
+  - cloneの呼び出しを見ると、いくつかの任意のコードが実行されており、そのコードには負荷がかかる可能性がある
+- ヒープデータもコピーした場合になる
+
+##### スタックのみのデータ：コピー
+```
+let x = 5;
+let y = x;
+
+println!("x = {}, y = {}", x, y);
+```
+
+- クローンを呼び出す呼び出しはありませんが、xはまだ有効であり、yに移動されていない
+  - コンパイル時に既知のサイズを持つ整数などの型は完全にスタックに格納されるため、実際の値のコピーをすばやく作成できるため
+  - ここではディープコピーとシャローコピーに違いはないため
+- コピーであるタイプの一部
+  - u32などのすべての整数型
+  - ブール型の値で、値はtrueとfalse
+  - f64などのすべての浮動小数点型
+  - 文字タイプchar
+  - タプル（コピーでもあるタイプのみを含む場合） たとえば、（i32、i32）はコピーですが、（i32、String）はそうではありません
+
+##### 所有権と関数
+```
+fn main() {
+    let s = String::from("hello");  // s comes into scope
+
+    takes_ownership(s);             // s's value moves into the function...
+                                    // ... and so is no longer valid here
+
+    let x = 5;                      // x comes into scope
+
+    makes_copy(x);                  // x would move into the function,
+                                    // but i32 is Copy, so it’s okay to still
+                                    // use x afterward
+
+} // Here, x goes out of scope, then s. But because s's value was moved, nothing
+  // special happens.
+
+fn takes_ownership(some_string: String) { // some_string comes into scope
+    println!("{}", some_string);
+} // Here, some_string goes out of scope and `drop` is called. The backing
+  // memory is freed.
+
+fn makes_copy(some_integer: i32) { // some_integer comes into scope
+    println!("{}", some_integer);
+} // Here, some_integer goes out of scope. Nothing special happens.
+```
+- takes_ownershipの呼び出し後にsを使用しようとすると、Rustはコンパイル時エラーになる
+
+##### 戻り値とスコープ
+- 書き方の例のみあげておきます
+```
+fn main() {
+    let s1 = gives_ownership();         // gives_ownership moves its return
+                                        // value into s1
+
+    let s2 = String::from("hello");     // s2 comes into scope
+
+    let s3 = takes_and_gives_back(s2);  // s2 is moved into
+                                        // takes_and_gives_back, which also
+                                        // moves its return value into s3
+} // Here, s3 goes out of scope and is dropped. s2 goes out of scope but was
+  // moved, so nothing happens. s1 goes out of scope and is dropped.
+
+fn gives_ownership() -> String {             // gives_ownership will move its
+                                             // return value into the function
+                                             // that calls it
+
+    let some_string = String::from("hello"); // some_string comes into scope
+
+    some_string                              // some_string is returned and
+                                             // moves out to the calling
+                                             // function
+}
+
+// takes_and_gives_back will take a String and return one
+fn takes_and_gives_back(a_string: String) -> String { // a_string comes into
+                                                      // scope
+
+    a_string  // a_string is returned and moves out to the calling function
+}
+```
+
+- タプルを利用して複数の値を返すこともできる
+```
+fn main() {
+    let s1 = String::from("hello");
+
+    let (s2, len) = calculate_length(s1);
+
+    println!("The length of '{}' is {}.", s2, len);
+}
+
+fn calculate_length(s: String) -> (String, usize) {
+    let length = s.len(); // len() returns the length of a String
+
+    (s, length)
+}
+```
+ 
