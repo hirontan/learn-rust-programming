@@ -1156,4 +1156,133 @@ fn calculate_length(s: String) -> (String, usize) {
     (s, length)
 }
 ```
- 
+
+### 参照と借用
+- 変数宣言のすべてのタプルコードと関数の戻り値がなくなるように、`calculate_length`を変更
+- Stringではなく＆Stringを使用
+  - ＆String 構文を使用すると、string の値を参照するがそれを所有しない参照を作成できる
+  - 所有していないので、参照が範囲外になったときに、値はドロップされない
+  - 関数パラメーターのスコープと同じだが、所有権がないためスコープが外れたときに参照したものを削除しない
+  - 関数が実際の値の代わりにパラメーターとして参照を持つ場合、所有権がなかったため
+  - 参照を関数パラメータの借用と呼びます。
+```
+fn main() {
+    let s1 = String::from("hello");
+
+    let len = calculate_string_length(&s1);
+
+    println!("The length of '{}' is {}.", s1, len);
+}
+
+fn calculate_string_length(s: &String) -> usize {
+    s.len()
+}
+```
+
+##### 可変参照
+- ＆mutを使用して可変参照を作成し、some_string：＆mut Stringを使用して可変参照を受け入れる必要がある
+```
+fn main() {
+    let mut s = String::from("hello");
+
+    change(&mut s);
+}
+
+fn change(some_string: &mut String) {
+    some_string.push_str(", world");
+}
+```
+
+- 特定のスコープ内の特定のデータへの変更可能な参照は1つだけ
+  - 下記のようにコードを書くことができない
+```
+let mut s = String::from("hello");
+
+let r1 = &mut s;
+let r2 = &mut s;
+
+println!("{}, {}", r1, r2);
+```
+
+- この制限の利点は、コンパイル時のデータ競合を防止できること
+- データの競合は3つの動作が発生したとき
+  - 2つ以上のポインターが同じデータに同時にアクセス
+  - 少なくとも1つのポインターがデータへの書き込みに使用されている
+  - データへのアクセスを同期するために使用されるメカニズムがない
+- 新しいスコープを作成し、同時参照ではなく複数の可変参照を許可できる
+
+```
+let mut s = String::from("hello");
+
+{
+    let r1 = &mut s;
+
+} // r1 goes out of scope here, so we can make a new reference with no problems.
+
+let r2 = &mut s;
+```
+
+- 変更可能な参照と不変の参照を組み合わせるための同様のルールがある
+  - 下記はエラーになる
+    - 不変の参照がある間は、変更可能な参照を持つことはできない
+    - 複数の不変参照は問題ない
+```
+let mut s = String::from("hello");
+
+let r1 = &s; // no problem
+let r2 = &s; // no problem
+let r3 = &mut s; // BIG PROBLEM
+
+println!("{}, {}, and {}", r1, r2, r3);
+```
+
+- 参照の範囲は、その参照が最後に使用されたときまで続くことに注意
+  - 下記は問題なく動作する
+  - 不変参照r1およびr2のスコープはprintln!で終了する
+  - コンパイラが潜在的なバグを早期に（実行時ではなくコンパイル時に）指摘してくれる
+```
+let mut s = String::from("hello");
+
+let r1 = &s; // no problem
+let r2 = &s; // no problem
+println!("{} and {}", r1, r2);
+// r1 and r2 are no longer used after this point
+
+let r3 = &mut s; // no problem
+println!("{}", r3);
+```
+
+##### ダングリングリファレンス
+- ポインターを使用する言語では、ダングリングポインター（他のユーザーに与えられた可能性のあるメモリー内の場所を参照するポインター）を誤って作成し、そのメモリーへのポインターを保持しながらメモリを解放することは簡単
+- Rustでは、コンパイラーは参照から参照になることは決してないことを保証する
+  - データ参照がある場合、コンパイラーはデータ参照が行われる前に、データがスコープから外れないことを保証する
+
+- ダングリングリファレンスの例
+  - この関数の戻り値の型には借用した値が含まれていますが、値がありませんとエラーが出る
+  - dangleのコードが終了すると、sは割り当て解除されているが、、参照を返そうとして無効な文字列を指してしまっている
+```
+fn main() {
+    let reference_to_nothing = dangle();
+}
+
+fn dangle() -> &String {
+    let s = String::from("hello");
+
+    &s
+}
+```
+
+- 直接文字列を返すことで解決される
+```
+fn no_dangle() -> String {
+    let s = String::from("hello");
+
+    s
+}
+```
+
+##### 参照のルール
+- 1つの変更可能な参照、または任意の数の不変の参照を持つことができる
+- 参照は常に有効である必要がある
+
+

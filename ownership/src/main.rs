@@ -51,7 +51,37 @@ fn main() {
                                         // takes_and_gives_back, which also
                                         // moves its return value into s3
 
+    // タプル
     println!("s1 = {}, s3 = {}", s1, s3);
+
+    let s1 = String::from("hello");
+
+    let (s2, len) = calculate_length(s1);
+
+    println!("The length of '{}' is {}.", s2, len);
+
+    // string length
+    let s1 = String::from("hello");
+    let len = calculate_string_length(&s1);
+    println!("The length of '{}' is {}.", s1, len);
+
+    // mutable references
+    let mut s = String::from("hello");
+    change(&mut s);
+
+
+    let mut s = String::from("hello");
+    
+    let r1 = &s; // no problem
+    let r2 = &s; // no problem
+    println!("{} and {}", r1, r2);
+    // r1 and r2 are no longer used after this point
+    
+    let r3 = &mut s; // no problem
+    println!("{}", r3);
+
+    let reference_to_nothing = no_dangle();
+    println!("{}", reference_to_nothing);
 }
 
 fn takes_ownership(some_string: String) { // some_string comes into scope
@@ -79,4 +109,27 @@ fn takes_and_gives_back(a_string: String) -> String { // a_string comes into
                                                       // scope
 
     a_string  // a_string is returned and moves out to the calling function
+}
+
+// タプル
+fn calculate_length(s: String) -> (String, usize) {
+    let length = s.len(); // len() returns the length of a String
+
+    (s, length)
+}
+
+// string length
+fn calculate_string_length(s: &String) -> usize {
+    s.len()
+}
+
+// mutable references
+fn change(some_string: &mut String) {
+    some_string.push_str(", world");
+}
+
+fn no_dangle() -> String {
+    let s = String::from("hello");
+
+    s
 }
