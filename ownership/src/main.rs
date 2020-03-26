@@ -82,6 +82,23 @@ fn main() {
 
     let reference_to_nothing = no_dangle();
     println!("{}", reference_to_nothing);
+
+    let my_string = String::from("hello world");
+
+    // first_word works on slices of `String`s
+    let word = first_word(&my_string[..]);
+    println!("{}", word);
+
+    let my_string_literal = "hello world";
+
+    // first_word works on slices of string literals
+    let word = first_word(&my_string_literal[..]);
+    println!("{}", word);
+
+    // Because string literals *are* string slices already,
+    // this works too, without the slice syntax!
+    let word = first_word(my_string_literal);
+    println!("{}", word);
 }
 
 fn takes_ownership(some_string: String) { // some_string comes into scope
@@ -132,4 +149,16 @@ fn no_dangle() -> String {
     let s = String::from("hello");
 
     s
+}
+
+fn first_word(s: &str) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+
+    &s[..]
 }

@@ -1285,4 +1285,87 @@ fn no_dangle() -> String {
 - 1つの変更可能な参照、または任意の数の不変の参照を持つことができる
 - 参照は常に有効である必要がある
 
+### スライス型
+- 所有権を持たないもう1つのデータ型はスライス
+  - コレクション全体ではなく、コレクション内の要素の連続したシーケンスを参照できる
+
+```
+fn first_word(s: &String) -> usize {
+    // 文字列をバイトの配列に変換
+    let bytes = s.as_bytes();
+
+    // バイトの配列に対してイテレーターを作成
+    // enumerateから返されるタプルの最初の要素はインデックスで、2番目の要素は要素への参照
+    for (i, &item) in bytes.iter().enumerate() {
+        // スペースが見つかったら、位置を返す
+        if item == b' ' {
+            return i;
+        }
+    }
+
+    s.len()
+}
+```
+
+##### 文字列スライス
+```
+let s = String::from("hello world");
+
+let hello = &s[0..5];
+let world = &s[6..11];
+```
+- 文字列全体への参照ではなく、文字列の一部への参照
+- [starting_index..ending_index]を指定することで、スライスを作成できる
+  - 内部的に、スライスデータ構造は、スライスの開始位置と長さを格納
+  - let world =＆s [6..11];の場合、worldは、長さが5のsの7番目のバイト（1から数えて）へのポインターを含むスライス
+  - 「..」範囲構文を使用して、最初のインデックス（ゼロ）から開始する場合は、「..」の前の値を削除
+    - スライスに文字列の最後のバイトが含まれている場合は、末尾の数字を削除
+    - `&s[..];` のように全体を取得することもできる
+
+##### 文字リテラルはスライス
+```
+let s = "Hello, world!";
+```
+- ここでのsのタイプは＆str
+  - バイナリの特定のポイントを指すスライス
+  - 文字列リテラルが不変である理由
+  -  ＆strは不変の参照
+
+##### パラメータとしての文字列スライス
+- ＆String値と＆str値の両方で同じ関数を使用できる
+```
+fn first_word(s: &str) -> &str {
+```
+
+- 文字列スライスがある場合は、直接渡せる
+  - 文字列がある場合は、文字列全体のスライスを渡すことができる
+  -  文字列への参照の代わりに文字列スライスを取得する関数を定義すると、APIは機能を失わない
+
+```
+fn main() {
+    let my_string = String::from("hello world");
+
+    // first_word works on slices of `String`s
+    let word = first_word(&my_string[..]);
+
+    let my_string_literal = "hello world";
+
+    // first_word works on slices of string literals
+    let word = first_word(&my_string_literal[..]);
+
+    // Because string literals *are* string slices already,
+    // this works too, without the slice syntax!
+    let word = first_word(my_string_literal);
+}
+```
+
+##### その他のスライス
+- 配列の一部を参照
+
+```
+let a = [1, 2, 3, 4, 5];
+
+let slice = &a[1..3];
+```
+
 
