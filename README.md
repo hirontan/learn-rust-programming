@@ -1368,4 +1368,156 @@ let a = [1, 2, 3, 4, 5];
 let slice = &a[1..3];
 ```
 
+## Using Structs to Structure Related Data
+
+- 構造体は、構成する複数の関連する値に名前を付けてパッケージ化できるカスタムデータ型
+- オブジェクト指向言語に精通している場合、構造体はオブジェクトのデータ属性のようなもの
+- コンパイル時の型チェックを最大限に活用するためにプログラムのドメインで新しい型を作成するための構成要素
+
+### 構造の定義とインスタンス化
+- 構造体はタプルに似ている
+- 各データに名前を付け、値の意味が明確に
+- 構造体はタプルよりも柔軟性がある
+- インスタンスの値を指定して、値にアクセスする
+- データの順序に依存しない
+- 構造体を定義
+  - キーワード`struct`と入力し、構造体全体に名前を付ける
+  - 構造体の名前は、グループ化されるデータの重要性を説明するものである必要がある
+  - `{}`の内側で、データの名前とタイプを定義。これらをフィールドと呼ぶ
+
+```
+struct User {
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+```
+
+- 構造体の使用
+  - 各フィールドに具体的な値を指定して、その構造体のインスタンスを作成
+  - key：valueペアを含む`{}`を追加
+  - keyはフィールドの名前。値はこれらのフィールドに格納するデータ
+  - 構造体で宣言した同順序でフィールドを指定する必要はない
+    - 構造体の定義は型の一般的なテンプレートのようなもの
+
+```
+let user1 = User {
+    email: String::from("someone@example.com"),
+    username: String::from("someusername123"),
+    active: true,
+    sign_in_count: 1,
+};
+```
+
+- 構造体から値を取得するには、ドット表記を使用
+- インスタンスが変更可能な場合、ドット表記を使用して値を変更し、特定のフィールドに割り当てることができる
+```
+let mut user1 = User {
+    email: String::from("someone@example.com"),
+    username: String::from("someusername123"),
+    active: true,
+    sign_in_count: 1,
+};
+
+user1.email = String::from("anotheremail@example.com");
+```
+
+- 特定のフィールドのみを変更可能
+
+```
+fn build_user(email: String, username: String) -> User {
+    User {
+        email: email,
+        username: username,
+        active: true,
+        sign_in_count: 1,
+    }
+}
+```
+
+##### 変数とフィールドの名前が同じ場合のフィールド初期化の省略形の使用
+- フィールド名と変数を繰り返さない省略形がある
+```
+fn build_user(email: String, username: String) -> User {
+    User {
+        email,
+        username,
+        active: true,
+        sign_in_count: 1,
+    }
+}
+```
+
+##### Struct Update構文を使用して他のインスタンスからインスタンスを作成する
+- 古いインスタンスの値のほとんどを使用し、一部を変更する構造体の新しいインスタンスを作成すると便利
+- 構造体更新構文を使用
+
+```
+let user2 = User {
+    email: String::from("another@example.com"),
+    username: String::from("anotherusername567"),
+    active: user1.active,
+    sign_in_count: user1.sign_in_count,
+};
+```
+
+- `..`構文は、明示的に設定されていない残りのフィールドが、指定されたインスタンスのフィールドと同じ値であることを指定する
+
+```
+let user2 = User {
+    email: String::from("another@example.com"),
+    username: String::from("anotherusername567"),
+    ..user1
+};
+```
+
+##### 名前付きフィールドのないタプル構造を使用して異なるタイプを作成
+- タプル構造体と呼ばれる、タプルに似た構造体を定義することもできる
+- タプルには、構造名が提供する意味が追加されていますが、フィールドに関連付けられた名前はない
+  - フィールドの型を持っているだけ
+- タプル構造体は、タプル全体に名前を付け、他のタプルとは異なる型にしたい場合に役立つ
+- タプル構造体の定義
+  - 構造体キーワードと構造体名で始まり、その後にタプル内の型が続く
+
+```
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+let black = Color(0, 0, 0);
+let origin = Point(0, 0, 0);
+```
+
+- 構造体内のフィールドは同じ型ですが、定義する各構造は独自の型
+  - 両方の型が3つの`i32`値で構成されている場合でも、引数として違う関数を受け取れない
+- タプル構造体インスタンスはタプルのように動作
+- インスタンスを個別の部分に分解・使用できる。 その後に、個々の値にアクセスするためのインデックスが続く
+
+##### フィールドのないユニットのような構造体
+- フィールドを持たない構造体を定義することもできる
+- ユニットタイプ（）と同様に動作するため、ユニットのような構造体と呼ばれる
+
+###### 構造データの所有権
+- User構造体の定義では、＆str文字列スライスタイプではなく、所有されている文字列タイプを使用した
+- 構造体のインスタンスがすべてのデータを所有し、構造体全体が有効である限りそのデータが有効である
+- 構造体が別のものが所有するデータへの参照を格納することは可能だが、ライフタイムを使用する必要がある
+  - 下記は機能しない
+
+```
+struct User {
+    username: &str,
+    email: &str,
+    sign_in_count: u64,
+    active: bool,
+}
+
+fn main() {
+    let user1 = User {
+        email: "someone@example.com",
+        username: "someusername123",
+        active: true,
+        sign_in_count: 1,
+    };
+}
+```
 
