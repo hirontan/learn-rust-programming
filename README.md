@@ -1521,3 +1521,116 @@ fn main() {
 }
 ```
 
+### 構造体を使用したサンプルプログラム
+- 長方形の面積を計算するプログラム
+- 単一の変数から始めて、構造体を使用するまでプログラムをリファクタリングする
+
+```
+fn main() {
+    let width1 = 30;
+    let height1 = 50;
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area(width1, height1)
+    );
+}
+
+fn area(width: u32, height: u32) -> u32 {
+    width * height
+}
+```
+
+- 幅と高さをグループ化すると、読みやすく、管理しやすくなる
+
+##### タプルを使用したリファクタリング
+
+```
+fn main() {
+    let rect1 = (30, 50);
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area(rect1)
+    );
+}
+
+fn area(dimensions: (u32, u32)) -> u32 {
+    dimensions.0 * dimensions.1
+}
+```
+
+- タプルを使用すると、構造を追加でき、引数を1つだけ渡せる
+  - タプルは要素に名前を付けていないため、タプルの部分にインデックスを付ける必要があるため、計算がさらに複雑になる
+  - インデックスの番号を覚えておく必要がある → 値を忘れやすくなる
+
+##### 構造体によるリファクタリング：意味を追加する
+- 構造体を使用して、データにラベルを付けることで意味を追加する
+  - 造体を所有するのではなく借用
+  - 関数シグネチャで＆を使用する
+  - 値にわかりやすい名前を付ける
+```
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area(&rect1)
+    );
+}
+
+fn area(rectangle: &Rectangle) -> u32 {
+    rectangle.width * rectangle.height
+}
+```
+
+##### 派生した特性を持つ有用な機能の追加
+```
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+
+    println!("rect1 is {}", rect1);
+}
+```
+
+- 上記は機能しない。エラーは下記に
+
+```
+error[E0277]: `Rectangle` doesn't implement `std::fmt::Display`
+```
+
+- `println!`は`std::fmt::Display`を利用している
+  - プリミティブ型は、表示する方法が1つしかないため問題ない
+  - 構造体は、多くの表示の可能性があるため、出力のフォーマットはあまり明確ではない。曖昧さを許容しないようにしている
+- マクロ呼び出し（構造体を呼び出す）：`{:?}`を利用する
+  - `Debug`の出力形式で利用できる
+  - `#[derive(Debug)]`と明示する必要がある
+
+```
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+
+    println!("rect1 is {:?}", rect1);
+}
+```
+
+- 構造体が大きい場合、出力を少し読みやすくする方法
+  - `{:?}`を`{:#?}`に変更する
+
+
