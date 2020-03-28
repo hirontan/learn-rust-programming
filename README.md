@@ -1633,4 +1633,116 @@ fn main() {
 - 構造体が大きい場合、出力を少し読みやすくする方法
   - `{:?}`を`{:#?}`に変更する
 
+### メソッド構文
+- メソッド
+  - 関数に似ている
+  - `fn`キーワードとその名前で宣言される
+  - パラメーターと戻り値を持てる
+  - 実行コードが存在する
+  - 関数とは異なり、構造体のコンテキスト内で定義され、最初のパラメーターは常に`self`
+  - メソッドが呼び出されている構造体のインスタンス
+
+##### メソッドの定義
+```
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area()
+    );
+}
+```
+
+- 変更前
+  - `area`関数を呼び出して`rect1`を引数として渡していた
+- 変更後
+  - メソッド構文を使用して、`Rectangle`インスタンスの`area`メソッドを呼び出す
+  - メソッド構文はインスタンスの後に続く
+- メソッドが`impl Rectangle`コンテキスト内にあるため、`self`が`Rectangle`であることを認識している
+- メソッドは`self`の所有権を取得、借用できる
+  - `self` 、`&self` 、`&mut self`
+  - `self`を使用して、インスタンスの所有権を取得
+  - `&self`は、所有権を取得するのではなく、構造体のデータを読み取る
+  - `&mut self`は、呼び出したインスタンスを変更する場合に利用する
+
+##### Where’s the `->` Operator?
+- CおよびC++のアロー演算子
+  - `*`：ポインタの指すデータへのアクセス
+  - `.`：構造体のメンバへのアクセス
+  - `->`：`*`と`.`を両方担える
+- Rustの自動参照と逆参照
+  - CおよびC++のアロー演算子に相当するものはない
+  - メソッドを呼び出すと、自動的に＆、＆mut、または*を追加する
+  - メソッドが読み取り（＆self）、変更（＆mut self）、または消費（self）のいずれであるかを明確に把握できる
+
+##### パラメータが多いメソッド
+- メソッドは、selfパラメータの後にシグネチャに追加する複数のパラメータを取ることができる
+```
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+
+ft main(){
+    let rect1 = Rectangle { width: 30, height: 50 };
+    let rect2 = Rectangle { width: 10, height: 40 };
+    let rect3 = Rectangle { width: 60, height: 45 };
+
+    println!("Can rect1 hold rect2? {}", rect1.can_hold(&rect2));
+    println!("Can rect1 hold rect3? {}", rect1.can_hold(&rect3));
+}
+```
+
+##### 関連関数
+- `self`を引数に取らない関数を定義
+- 構造体の新しいインスタンスを返すコンストラクターによく使用される
+- 関連関数を呼び出すには、`::`構文と構造体名を使用する
+
+```
+impl Rectangle {
+    fn square(size: u32) -> Rectangle {
+        Rectangle { width: size, height: size }
+    }
+}
+```
+
+##### 複数`impl`ブロック
+- 下記のように分かれて活用することもできる
+```
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+impl Rectangle {
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+```
+
 
