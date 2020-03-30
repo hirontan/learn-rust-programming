@@ -1745,4 +1745,214 @@ impl Rectangle {
 }
 ```
 
+## 列挙型とパターンマッチング
 
+### Defining an Enum
+- 列挙型が構造体よりも有用な場合もある
+  - 例）IPアドレスにはIPv4とIPv6の主要な標準がある
+
+```
+enum IpAddrKind {
+    V4,
+    V6,
+}
+```
+
+##### 列挙値
+```
+let four = IpAddrKind::V4;
+let six = IpAddrKind::V6;
+```
+
+- 識別子の下に名前空間がある
+- 両方の値が同じタイプになっている
+
+```
+fn route(ip_kind: IpAddrKind) { }
+```
+
+下記のどちらかで呼び出せる
+```
+route(IpAddrKind::V4);
+route(IpAddrKind::V6);
+```
+
+- 2つのフィールドを持つIpAddr構造体を定義
+- `home`や`loopback`にそれぞれ値を読み込んでいる
+```
+enum IpAddrKind {
+    V4,
+    V6,
+}
+
+struct IpAddr {
+    kind: IpAddrKind,
+    address: String,
+}
+
+let home = IpAddr {
+    kind: IpAddrKind::V4,
+    address: String::from("127.0.0.1"),
+};
+
+let loopback = IpAddr {
+    kind: IpAddrKind::V6,
+    address: String::from("::1"),
+};
+```
+
+- 列挙型だけを使用して、同じ概念をより簡潔に表すことができる
+```
+enum IpAddr {
+    V4(String),
+    V6(String),
+}
+
+let home = IpAddr::V4(String::from("127.0.0.1"));
+
+let loopback = IpAddr::V6(String::from("::1"));
+```
+
+- 列挙型は、関連するデータ型と情報量が異なる場合、有用
+
+```
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+let home = IpAddr::V4(127, 0, 0, 1);
+
+let loopback = IpAddr::V6(String::from("::1"));
+```
+
+- IPアドレスを格納・エンコードすることは、一般的であるため、標準ライブラリで備わっている
+
+```
+
+struct Ipv4Addr {
+    // --snip--
+}
+
+struct Ipv6Addr {
+    // --snip--
+}
+
+enum IpAddr {
+    V4(Ipv4Addr),
+    V6(Ipv6Addr),
+}
+```
+
+- 列挙型に任意の種類のデータ（文字列、数値型、構造体など）を配置できる
+
+```
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+```
+
+- 構造体と列挙型は似ている
+
+```
+struct QuitMessage; // unit struct
+struct MoveMessage {
+    x: i32,
+    y: i32,
+}
+struct WriteMessage(String); // tuple struct
+struct ChangeColorMessage(i32, i32, i32); // tuple struct
+```
+
+- それぞれがタイプを持つさまざまな構造体を使用した場合、メッセージを受け取る関数を簡単に定義できません
+- implを使用してstructにメソッドを定義できるのと同じように、enumにメソッドを定義することもできる
+
+```
+impl Message {
+    fn call(&self) {
+        // method body would be defined here
+    }
+}
+
+let m = Message::Write(String::from("hello"));
+m.call();
+```
+
+##### 列挙型オプションとNull値に対するその利点
+- 標準ライブラリで定義されている列挙型であるオプション
+- 型で表現すると、コンパイラーは処理する必要があるすべてのケースを確認する
+- `Rust`にはNullがない
+  - Nullは、そこに値がないことを意味する値
+  - Nullを使用する言語では、変数は常に2つの状態（nullまたはnot-null）のいずれか
+
+- 「Null References：The Billion Dollar Mistake」で、nullの発明者であるTony Hoareが説明していること
+  - 10億ドルの間違い
+  - 全てのリファレンスが問題のないことを確認するため、コンパイラでチェックを自動化することが目標であった
+  - null参照をこれに含めるのは、非常に簡単であった
+  - 数え切れないほどのエラーや脆弱性、システムクラッシュの原因となり、10億ドル単位の損害や苦労を引き起こしてきた
+
+- Rustにはnullはありませんが、存在するまたは存在しない値の概念をエンコードできる列挙型がある
+
+```
+enum Option<T> {
+    Some(T),
+    None,
+}
+```
+
+- Option <T>列挙型は明示的にスコープに入れる必要はない
+- 直接SomeおよびNoneを使用できる
+
+る
+
+```
+enum Option<T> {
+    Some(T),
+    None,
+}
+```
+
+- Option <T>列挙型は明示的にスコープに入れる必要はない
+- 直接SomeおよびNoneを使用できる
+- <T>はOption列挙型のSomeが任意の型のデータを1つ保持できることを意味している
+
+```
+let some_number = Some(5);
+let some_string = Some("a string");
+
+let absent_number: Option<i32> = None;
+```
+
+- Option <T>とT（Tは任意の型）は異なる型
+- 下記はエラーになる
+
+```
+let x: i8 = 5;
+let y: Option<i8> = Some(5);
+
+let sum = x + y;
+```
+
+- エラーの出力
+
+```
+error[E0277]: the trait bound `i8: std::ops::Add<std::option::Option<i8>>` is
+not satisfied
+ -->
+  |
+5 |     let sum = x + y;
+  |                 ^ no implementation for `i8 + std::option::Option<i8>`
+  |
+```
+
+- i8の型の値がある場合、コンパイラーは常に有効な値を持っていることを認識している
+  - その値は、nullをチェックする必要がない
+- Option <i8>は、値がない可能性も考慮する必要がある
+  - Option <T>をTに変換してからT演算を実行する必要がある
+  - nullでないものも想定している
+- nullの普及を制限し、コードの安全性を高めるという意図的な設計決定
+  - nullの可能性がある値を取得するには、その値のタイプをOption <T>にして明示的にオプトインする必要がある
+- Option<T> enum
