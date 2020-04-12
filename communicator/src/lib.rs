@@ -16,7 +16,7 @@
 //     }
 // }
 
-mod client;
+pub mod client;
 
 // mod network {
 //     fn connect() {
@@ -28,4 +28,4 @@ mod client;
 //     }
 // }
 
-mod network;
+pub mod network;

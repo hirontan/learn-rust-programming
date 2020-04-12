@@ -2376,3 +2376,158 @@ $ mv src/server.rs src/network
 │   ├── bar.rs (`foo::bar`内の定義を含む)
 │   └── mod.rs (`mod bar`を含む、`foo`内の定義を含む)
 ```
+
+### `pub`で公開するか制御する
+- これまで関数が使用されていないと警告が出力されていた
+  - 作成していた関数は他のプロジェクトで利用することにある
+- 外部から`communicator`ライブラリをを利用してみて確認してみる
+  - `src/main.rs`を同じディレクトリに作成する
+  - `extern crate`で`communicator`ライブラリクレートをスコープに導入
+- Cargoは`src/main.rs`をバイナリクレートのルートファイルとして扱い、`src/lib.rs`は既存のライブラリクレートとは区別される
+  - `extern crate`はルートモジュールに記述する
+```
+// src/main.rs
+extern crate communicator;
+
+fn main() {
+    communicator::client::connect();
+}
+```
+- `client`モジュールが非公開であることから、実行するとエラーになる
+```
+error[E0603]: module `client` is private
+  --> src/main.rs:4:19
+   |
+4  |     communicator::client::connect();
+   |                   ^^^^^^ this module is private
+   |
+```
+- 警告は、関数を公開にすると、コンパイラが、他のコードから扱われることを理解してくれるので、警告が消える
+
+##### 関数を公開にする
+- `警告が出ていたところを解消するため、`client`モジュールを公開にする
+  - `mod`の直前に`pub`キーワードを追加する
+```
+// src/lib.rs
+pub mod client;
+
+mod network;
+```
+- 関数`connect`も非公開になっているので、公開に変更する
+  - その他の警告も解消する
+```
+// src/client.rs
+pub fn connect() {
+}
+```
+- `src/lib.rs`
+```
+// src/lib.rs
+pub mod client;
+
+pub mod network;
+```
+- src/network/mod.rs
+```
+// src/network/mod.rs
+pub fn connect() {
+}
+
+pub mod server;
+```
+
+- `src/network/server.rs`
+```
+// src/network/server.rs
+pub fn connect() {
+}
+```
+
+##### プライバシー規則
+- 要素の公開性ルール
+  - 要素が公開なら、どの親モジュールを通してもアクセス可能
+  - 要素が非公開なら、親モジュールと子モジュールのみアクセス可能
+
+##### プライバシー例
+- 新しいライブラリプロジェクトを作成
+```
+$ cargo new privacy_example --lib
+$ cd privacy_example/
+```
+
+- `src/lib.rs`を下記に編集
+```
+mod outermost {
+    pub fn middle_function() {}
+
+    fn middle_secret_function() {}
+
+    mod inside {
+        pub fn inner_function() {}
+
+        fn secret_function() {}
+    }
+}
+
+fn try_me() {
+    outermost::middle_function();
+    outermost::middle_secret_function();
+    outermost::inside::inner_function();
+    outermost::inside::secret_function();
+}
+```
+
+##### エラーを確かめる
+- `try_me`関数は、プロジェクトのルートモジュールに存在
+  - `outermost`モジュールは非公開だが、`try_me`と同じく`outermost`は現在(ルート)のモジュールなので、`try_me`関数は`outermost`モジュールにアクセス許可される
+- `middle_function`は公開なので、`outermost::middle_function`の呼び出しも動作する
+  - `try_me`は`middle_function`に親モジュールの`outermost`を通してアクセスできる
+- `outermost::middle_secret_function`の呼び出しは、コンパイルエラーになる
+  - `middle_secret_function`は非公開で、`middle_secret_function`の現在のモジュール`outermost`でも、`middle_secret_function`の現在の子モジュールでもない
+- `inside`モジュールは非公開で`outermost`からのみアクセスできる
+  - `try_me`関数は、`outermost::inside`内の関数を呼び出すことを許されない
+
+##### エラーを修正する
+```
+// src/lib.rs
+mod outermost {
+    pub fn middle_function() {}
+
+    pub fn middle_secret_function() {}
+
+    pub mod inside {
+        pub fn inner_function() {}
+
+        pub fn secret_function() {}
+    }
+}
+
+fn try_me() {
+    outermost::middle_function();
+    outermost::middle_secret_function();
+    outermost::inside::inner_function();
+    outermost::inside::secret_function();
+}
+```
+
+- 警告も修正
+```
+pub mod outermost {
+    pub fn middle_function() {}
+
+    pub fn middle_secret_function() {}
+
+    pub mod inside {
+        pub fn inner_function() {}
+
+        pub fn secret_function() {}
+    }
+}
+
+pub fn try_me() {
+    outermost::middle_function();
+    outermost::middle_secret_function();
+    outermost::inside::inner_function();
+    outermost::inside::secret_function();
+}
+```
