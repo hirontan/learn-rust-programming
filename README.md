@@ -2531,3 +2531,187 @@ pub fn try_me() {
     outermost::inside::secret_function();
 }
 ```
+
+### 異なるモジュールの名前を参照する
+- `nested_modules`関数を呼び出すためのサンプルを前回のプロジェクト`privacy_example`を利用していきます
+- フルパスを指定して関数を呼び出す
+```
+// src/main.rs
+pub mod a {
+    pub mod series {
+        pub mod of {
+            pub fn nested_modules() {}
+        }
+    }
+}
+
+fn main() {
+    a::series::of::nested_modules();
+}
+```
+
+##### `use`キーワードで名前をスコープに導入する
+- フルパス指定した参照するより、簡潔にするキーワードが用意されている
+  - 指定したものだけスコープになる
+```
+// src/main.rs
+pub mod a {
+    pub mod series {
+        pub mod of {
+            pub fn nested_modules() {}
+        }
+    }
+}
+
+use a::series::of;
+
+fn main() {
+    of::nested_modules();
+}
+```
+- `use`キーワードで関数を指定して、関数をスコープに入れることもできる
+  - 直接関数を参照できるようになる
+```
+pub mod a {
+    pub mod series {
+        pub mod of {
+            pub fn nested_modules() {}
+        }
+    }
+}
+
+use a::series::of::nested_modules;
+
+fn main() {
+    nested_modules();
+}
+```
+- `enum`もモジュールのように名前空間なので、`enum`の列挙子を`use`キーワードでスコープに導入できる
+- 1つの名前空間から複数の要素をスコープに導入する場合、`{}`を使用する
+  - `Green`は`use`文に含んでいないので、`TrafficLight::Green`を指定する
+```
+enum TrafficLight {
+    Red,
+    Yellow,
+    Green,
+}
+
+use TrafficLight::{Red, Yellow};
+
+fn main() {
+    let red = Red;
+    let yellow = Yellow;
+    let green = TrafficLight::Green;
+}
+```
+
+##### Globで全ての名前をスコープに導入する
+- 名前空間の要素を全てスコープに導入するには、`*`表記が使用できる
+- `glob(*)`演算子
+  - 名前の衝突を起こす可能性があるので、あまり使うべきでない
+```
+enum TrafficLight {
+    Red,
+    Yellow,
+    Green,
+}
+
+use TrafficLight::*;
+
+fn main() {
+    let red = Red;
+    let yellow = Yellow;
+    let green = Green;
+}
+```
+
+##### superを使用して親モジュールにアクセスする
+- ライブラリクレートを作成した時、Cargoは`tests`モジュールを用意してくれている
+  - `communicator`プロジェクトを利用する
+    - `tests`もただのモジュール
+```
+// src/lib.rs
+
+
+pub mod client;
+
+pub mod network;
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+```
+
+- `it_works`関数から`client::connect`関数を呼び出してみる
+```
+// src/lib.rs
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        client::connect();
+    }
+}
+```
+
+- `cargo test`コマンドを呼び出してテストを実行
+  - コンパイルに失敗する
+    - 原因はパスが常に現在のモジュールに対して相対的になり、ここでは`tests`になっているから
+    - 例外はuse文内、パスは標準でクレートのルートに相対的になる
+    - `tests`モジュールは`client`モジュールをスコープにいれる必要がある
+```
+$ cargo test
+   Compiling communicator v0.1.0 (............/communicator)
+error[E0433]: failed to resolve. Use of undeclared type or module `client`
+ --> src/lib.rs:30:9
+   |
+30 |         client::connect();
+   |         ^^^^^^ use of undeclared type or module `client`
+```
+
+- 現在のモジュールからモジュール階層を一つあげる方法
+  - `::client::connect();`
+  - `super::client::connect();`
+  - `use`を利用することで、親モジュールに対して相対にすることができる
+```
+#[cfg(test)]
+mod tests {
+    use super::client;
+
+    #[test]
+    fn it_works() {
+        client::connect();
+    }
+}
+```
+- 再度`cargo test`を実行する
+
+```
+$ cargo test
+   Compiling communicator v0.1.0 (................./communicator)
+    Finished test [unoptimized + debuginfo] target(s) in 1.01s
+     Running target/debug/deps/communicator-064e710be12f4b74
+
+running 1 test
+test tests::it_works ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+     Running target/debug/deps/communicator-f351c37161dfc4ce
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+   Doc-tests communicator
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
+
