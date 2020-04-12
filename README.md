@@ -2150,3 +2150,229 @@ if let Coin::Quarter(state) = coin {
 }
 ```
 
+## モジュール
+- モジュールを使用してコードを体系化し、再利用する
+- モジュールは関数や型定義を含む名前空間
+  - 定義がモジュールの外からも扱えるようにするか否か選択できる（Public / Private）
+- 概要
+  - `mod`キーワードで新規モジュールを宣言。モジュール内のコードは、この宣言の直後の`{}`内か、 別のファイルに存在する
+  - 標準では、関数/型/定数/モジュールは非公開(private)。pubキーワードで要素は公開され、 名前空間の外からも扱えるようになる
+  - `use`キーワードでモジュールやモジュール内の定義をスコープに入れることができる
+
+### `mod`とファイルシステム
+- 何らかの一般的なネットワーク機能を提供するライブラリの骨格を作成する
+- ライブラリ生成：`--bin`の代わりに`--lib`オプションを利用する
+  - `src/main.rs`の代わりに`src/lib.rs`が生成される
+```
+$ cargo new communicator --lib
+$ cd communicator
+```
+
+- `src/lib.rs`
+  - `src/main.rs`ファイルがないから、`cargo run`で実行できない
+  - `cargo build`でコードをコンパイルして利用する
+```
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+```
+
+##### モジュール定義
+- `communicator`ネットワークライブラリ
+  - `connect`関数を含む`network`モジュールを定義
+  - 関数を`network`モジュール外のスクリプトから呼び出したい場合、 モジュールを指定し、名前空間記法`::`を利用し`network::connect()`と指定する必要がある
+```
+mod network {
+    fn connect() {
+    }
+}
+```
+
+- 複数のモジュールを並べる
+  - 異なるモジュールに存在するので、関数がお互いに衝突しない
+  - `network::connect`と`client::connect`の関数が生成される
+- モジュール内にモジュールを書くことも可能
+```
+mod network {
+    fn connect() {
+    }
+}
+
+mod client {
+    fn connect() {
+    }
+}
+```
+- `client`モジュールを`network`モジュール内に移動させる
+  - `network::connect`と`network::client::connect`の関数が生成される
+```
+mod network {
+    fn connect() {
+    }
+
+    mod client {
+        fn connect() {
+        }
+    }
+}
+```
+
+##### モジュールを別ファイルに移す
+- `src/lib.rs`に三つのモジュールを生成 `client`、`network`、`network::server`
+```
+mod client {
+    fn connect() {
+    }
+}
+
+mod network {
+    fn connect() {
+    }
+
+    mod server {
+        fn connect() {
+        }
+    }
+}
+```
+
+- 関数の中身となるコードが長くなるので、分割する
+
+- `src/lib.rs`から`client`モジュールの中身を抽出する
+  - `client`モジュール
+    - ブロックを`;`で置換したことで、 `client`モジュールのスコープのコードは別の場所を探すようにコンパイラに指示している
+```
+// src/lib.rs
+mod client;
+
+mod network {
+    fn connect() {
+    }
+
+    mod server {
+        fn connect() {
+        }
+    }
+}
+```
+
+- clientモジュールのconnect関数を別ファイルに作成
+
+```
+// src/client.rs
+fn connect() {
+}
+```
+
+- ビルドしてみる
+
+```
+$ cargo build
+   Compiling communicator v0.1.0 (................./communicator)
+warning: function is never used: `connect`
+ --> src/client.rs:1:4
+  |
+1 | fn connect() {
+  |    ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: function is never used: `connect`
+  --> src/lib.rs:22:8
+   |
+22 |     fn connect() {
+   |        ^^^^^^^
+
+warning: function is never used: `connect`
+  --> src/lib.rs:26:12
+   |
+26 |         fn connect() {
+   |            ^^^^^^^
+
+    Finished dev [unoptimized + debuginfo] target(s) in 0.41s
+```
+
+- `network`モジュールも単独のファイルに抽出する
+
+```
+// src/lib.rs
+mod client;
+
+mod network;
+```
+
+```
+// src/network.rs
+fn connect() {
+}
+
+mod server {
+    fn connect() {
+    }
+}
+```
+
+- `src/network.rs`ファイルを`server`モジュールを抽出する
+
+```
+// src/network.rs
+fn connect() {
+}
+
+mod server;
+```
+
+```
+// src/server.rs
+fn connect() {
+}
+```
+
+- ビルドをここで実行してみる
+  - エラーが起こる
+    - コンパイラが、`server`は`network`のサブモジュールと考えられることを検知できないから
+```
+$ cargo build
+   Compiling communicator v0.1.0 (................./communicator)
+error[E0583]: file not found for module `server`
+ --> src/network.rs:9:5
+  |
+9 | mod server;
+  |     ^^^^^^
+  |
+  = help: name the file either network/server.rs or network/server/mod.rs inside the directory "src"
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0583`.
+error: could not compile `communicator`.
+
+To learn more, run the command again with --verbose.
+```
+
+- エラー解消する方法
+  1. 親モジュール名である`network`という名前の新規ディレクトリを作成する
+  2. `src/network.rs`ファイルを`network`ディレクトリに移し、 `src/network/mod.rs`と名前を変える
+  3. サブモジュールファイルの`src/server.rs`を`network`ディレクトリに移す
+
+```
+$ mkdir src/network
+$ mv src/network.rs src/network/mod.rs
+$ mv src/server.rs src/network
+```
+
+##### モジュールファイルシステムの規則
+- ファイルに関するモジュール規則
+  - `foo`モジュールにサブモジュールがなければ、`foo`の定義は、 `foo.rs`というファイルに書くべき
+  - `foo`モジュールにサブモジュールがあったら、`foo`の定義は、 `foo/mod.rs`というファイルに書くべき
+  - ルールは再帰的に適用される
+
+```
+├── foo
+│   ├── bar.rs (`foo::bar`内の定義を含む)
+│   └── mod.rs (`mod bar`を含む、`foo`内の定義を含む)
+```
