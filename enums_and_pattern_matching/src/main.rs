@@ -1,4 +1,3 @@
-#[derive(Debug)]
 
 // 列挙型と構造体
 // enum IpAddrKind {
@@ -22,24 +21,28 @@
 // };
 
 // 列挙型のみ
+#[derive(Debug)]
 enum IpAddr {
     V4(u8, u8, u8, u8),
     V6(String),
 }
 
+#[derive(Debug)]
 enum UsState {
     Alabama,
-    Alaska,
+    Alaska
 }
 
 enum Coin {
     Penny,
     Nickel,
     Dime,
+    Test,
     Quarter(UsState),
 }
 
 fn value_in_cents(coin: Coin) -> u32 {
+    let mut count = 0;
     match coin {
         Coin::Penny => {
             println!("Lucky penny!");
@@ -53,6 +56,10 @@ fn value_in_cents(coin: Coin) -> u32 {
         Coin::Quarter(state) => {
             println!("State quarter from {:?}!", state);
             25
+        },
+        _ => {
+            count += 1;
+            count
         }
     }
 }
@@ -70,5 +77,10 @@ fn main() {
     let c = Coin::Quarter(UsState::Alabama);
     let value = value_in_cents(c);
     println!("value: {}", value);
+
+    // let c2 = Coin::Quarter("test");
+    let c2 = Coin::Test;
+    let value2 = value_in_cents(c2);
+    println!("value: {}", value2);
 }
 

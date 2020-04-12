@@ -2103,3 +2103,50 @@ match some_u8_value {
 ```
 - `_`というパターンは、どんな値にもマッチする
 
+### `if let`で簡潔なフロー制御
+- 冗長性の少ない方法で組み合わせ、残りを無視しつつ、一つのパターンにマッチする値を扱うことができる
+- `Some(3)`の時だけ実行を行う
+```
+let some_u8_value = Some(0u8);
+match some_u8_value {
+    Some(3) => println!("three"),
+    _ => (),
+}
+```
+
+- `if let`を用いて短くできる
+
+```
+if let Some(3) = some_u8_value {
+    println!("three");
+}
+```
+
+- `if let`
+  - メリット：タイプ数が減り、インデントも少なくなり、定型コードも減る
+  - デメリット：包括的なチェックができなくなる
+    - パターンにマッチした時以外は無視する
+
+- `if let - else`
+  - elseに入るコードブロックは、 if letとelseに等価なmatch式の`_`の場合に入るコードブロックと同じ
+
+- `match`の場合
+```
+
+let mut count = 0;
+match coin {
+    // {:?}州のクォーターコイン
+    Coin::Quarter(state) => println!("State quarter from {:?}!", state),
+    _ => count += 1,
+}
+```
+- `if let - else`の場合
+```
+let mut count = 0;
+if let Coin::Quarter(state) = coin {
+    println!("State quarter from {:?}!", state);
+} else {
+    count += 1;
+}
+```
+
