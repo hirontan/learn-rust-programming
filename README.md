@@ -2204,8 +2204,65 @@ $ tree
     - このクレートでは、定義した`Rng`構造体を参照している
       - `rand`クレートから`Rng`トレイトにアクセスするには`rand::Rng`を使用
 
+### スコープとプライバシーを制御するためのモジュール定義
+- モジュールはクレート内のコードをグループにして、読みやすく再利用しやすいようにしてくれる。また、プライバシーも制御してくれる
+  - ex) レストランの機能を提供するライブラリクレートを作成
+    - 関数のシグネチャを定義。コードの構成のみ
+- クレートを構造化するには、機能を入れ子になったモジュールに整理
+  - `cargo new --lib restaurant`を実行し、`restaurant`ライブラリを作る
+  - `src/lib.rs`にて作成
 
-次に、モジュールシステムについて説明します。
+```
+$ cargo new --lib restaurant
+$ cd restaurant/
+$ tree
+.
+├── Cargo.toml
+└── src
+    └── lib.rs
+```
+- `src/lib.rs`
+```
+// src/lib.rs
+
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+
+        fn seat_at_table() {}
+    }
+
+    mod serving {
+        fn take_order() {}
+
+        fn serve_order() {}
+
+        fn take_payment() {}
+    }
+}
+```
+- モジュール
+  - `mod`キーワードで始める
+  - モジュールの本文は`{}`で囲む
+  - モジュールの中にモジュールも入れられる
+  - 造体、列挙型、定数、特性、関数を定義できる
+  - 全ての定義を読むよりもグループに基づいてコードをナビゲートできるので、定義を見つけることが簡単になる
+  - コードをどこに配置すれば良いのかもしれる
+- クレートルート
+  - `src/main.rs`と`src/lib.rs`
+- モジュールツリー構造
+  - ファイルシステムのディレクトリと同じように、モジュールを使ってコードを整理
+```
+crate
+ └── front_of_house
+     ├── hosting
+     │   ├── add_to_waitlist
+     │   └── seat_at_table
+     └── serving
+         ├── take_order
+         ├── serve_order
+         └── take_payment
+```
 
 ## モジュール
 - モジュールを使用してコードを体系化し、再利用する
