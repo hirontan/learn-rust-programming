@@ -53,6 +53,15 @@ mod back_of_house {
     }
 }
 
+// 絶対パス
+// use crate::front_of_house::hosting;
+
+// 相対パス
+// use front_of_house::hosting;
+
+// 再エクスポート
+pub use crate::front_of_house::hosting;
+
 pub fn eat_at_restaurant() {
     // Absolute path
     crate::front_of_house::hosting::add_to_waitlist();
@@ -77,4 +86,8 @@ pub fn eat_at_restaurant() {
 
     println!("order1: {:?}", order1);
     println!("order2: {:?}", order2);
+
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
 }

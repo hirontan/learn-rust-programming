@@ -283,3 +283,182 @@ pub fn eat_at_restaurant() {
     let order2 = back_of_house::Appetizer::Salad;
 }
 ```
+
+### `use`キーワードでパスをスコープにいれる
+- `use`キーワード
+  - 絶対パスか相対パスどちらを選択しても、パスを毎回書かなけれならなかった
+  - パス内のアイテムをローカルアイテムにあるかのようにできる
+  - シンボリックリンクを作成するのと似ている
+  - 使用時にスコープに持ち込まれるパスは、他のパスと同様にプライバシーもチェックする
+
+```
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+
+- use と相対パスを使ってアイテムをスコープにもできる
+```
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+
+##### Creating Idiomatic `use` Paths
+- 関数までスコープに入れてみる
+  - 相対パスや絶対パスで実行した例と達成するものは同じになるが、どこで関数が定義されているか不明瞭になる
+  - フルパスの繰り返しを最小限に抑えながら、関数がローカルに定義されていないことを明確にする必要がある
+```
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting::add_to_waitlist;
+
+pub fn eat_at_restaurant() {
+    add_to_waitlist();
+    add_to_waitlist();
+    add_to_waitlist();
+}
+```
+- 構造体や列挙型などを使いながら持ち込む場合、フルパスを指定するのがイディオム
+  - 標準ライブラリの`HashMap`構造体をバイナリクレートのスコープに持ち込むイディオムを例にしてみる
+
+```
+// src/main.rs
+use std::collections::HashMap;
+
+fn main() {
+    let mut map = HashMap::new();
+    map.insert(1, 2);
+}
+```
+
+- 同じ名前を持ちながらも親モジュールが異なる 2 つの結果型をスコープに持ち込む方法
+  - 親モジュールを使用することで2つの`Result`が区別される
+  - 代わりに`use std::fmt::Result`と`use std::io::Result`を指定した場合、同じスコープ内に2つの`Result`が存在し、どちらを意味しているのか分からなくなる
+```
+// src/lib.rs
+use std::fmt;
+use std::io;
+
+fn function1() -> fmt::Result {
+    // --snip--
+}
+
+fn function2() -> io::Result<()> {
+    // --snip--
+}
+```
+
+##### `as`キーワードで新しい名前を提供
+- 同じ名前の2つの型を同じスコープに持ち込む問題の解決策がある
+  - `as`で新しいローカル名もしくはエイリアスを指定する
+- 2つの`Result`型のうちの1つを`as`を使ってリネームする例
+
+```
+use std::fmt::Result;
+use std::io::Result as IoResult;
+
+fn function1() -> Result {
+    // --snip--
+}
+
+fn function2() -> IoResult<()> {
+    // --snip--
+}
+```
+
+##### `pub use`で名前を再エクスポート
+- `use`キーワードで名前をスコープにすると、新しいスコープで使用可能な名前は`private`になる
+- `pub use`
+  - 他がそのアイテムをスコープにするため、再エクスポートと呼ばれる
+    - プログラマがドメインについてどのように考えるか異なる時に便利になる
+  - スコープ外から`hosting::add_to_waitlist`で関数を呼び出せるようになる。新しいパスを呼び出せるようになる
+```
+// src/lib.rs
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+
+##### 外部パッケージの利用
+- `Rust`コミュニティのメンバーが`crates.io`でパッケージを公開してくれている
+  - https://crates.io/
+- パッケージに取り込むには、`Cargo.toml`ファイルにパッケージをリストアップし、`use`を使ってアイテムをスコープに入れる
+
+- 標準ライブラリ (std) もパッケージの外部にあるクレートであることに注意
+  - 標準ライブラリは Rust 言語に同梱されているので、`Cargo.toml`を変更する必要はないが、アイテムをパッケージのスコープに入れるために`use`を使う必要がある
+
+```
+use std::collections::HashMap;
+```
+
+##### ネストされたパスを使っていて、大規模リストをクリーンアップする
+- 同じモジュールで定義された複数のアイテムを使っている場合、それぞれのアイテムをそれぞれの行にリストアップすると、ファイルの縦方向のスペースを多く取る
+
+```
+use std::io;
+use std::cmp::Ordering;
+```
+
+- 同じアイテムを1行でスコープに入れるために入れ子になったパスを使うことができる
+- パスの共通部分を指定し`{}`で囲む
+
+```
+use std::{cmp::Ordering, io};
+```
+
+- 大規模なプログラムでは、パスを使って同じパッケージやモジュールから多くのアイテムをスコープにして持ってくることで、必要な個別の`use`文の数を大幅に減らすことができる
+-  サブパスを共有する2つの`use`ステートメントを組み合わせるときに便利
+
+```
+use std::io;
+use std::io::Write;
+```
+
+- 2つのパスの共通部分は`std::io`、一つの`use`ステートメントに合わせる場合、`self`を利用すると良い
+
+```
+use std::io::{self, Write};
+```
+
+##### `Glob`演算子
+- すべてのパブリックアイテムをスコープに入れたい場合は、パスの後にglob演算子`*`を利用
+  - 注意：どの名前がスコープ内にあるのか、プログラムで使用されている名前がどこで定義されているのかがわかりにくくなる
+- `glob`演算子は、テスト時によく使用され、テスト対象のすべてを`tests`モジュールに取り込むことができる
+```
+use std::collections::*;
+```
