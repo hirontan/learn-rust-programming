@@ -6,21 +6,26 @@
 //     }
 // }
 
-mod front_of_house {
-    pub mod hosting {
-        pub fn add_to_waitlist() {}
+// - front_of_houseモジュールを別ファイルに移動
+// mod front_of_house {
+//     pub mod hosting {
+//         pub fn add_to_waitlist() {}
+// 
+//         fn seat_at_table() {}
+//     }
+// 
+//     mod serving {
+//         fn take_order() {}
+// 
+//         fn serve_order() {}
+// 
+//         fn take_payment() {}
+//     }
+// }
 
-        fn seat_at_table() {}
-    }
+mod front_of_house;
 
-    mod serving {
-        fn take_order() {}
-
-        fn serve_order() {}
-
-        fn take_payment() {}
-    }
-}
+pub use crate::front_of_house::hosting;
 
 fn serve_order() {}
 
@@ -60,7 +65,7 @@ mod back_of_house {
 // use front_of_house::hosting;
 
 // 再エクスポート
-pub use crate::front_of_house::hosting;
+// pub use crate::front_of_house::hosting;
 
 pub fn eat_at_restaurant() {
     // Absolute path

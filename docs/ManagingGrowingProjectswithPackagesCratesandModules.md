@@ -462,3 +462,56 @@ use std::io::{self, Write};
 ```
 use std::collections::*;
 ```
+
+### Separating Modules into Different Files（モジュールを別のファイルに分ける）
+- モジュールが大きくなるとき、コードをナビゲートしやすくするため、別ファイルに移動させたい場合がある
+- 前回まで利用していた`restraunt`プロジェクトの`front_of_house`モジュールを`src/front_of_house.rs`に移動させてみる
+  - クレートのルートファイルは`src/lib.rs`
+  - `src/main.rs`であるバイナリクレートでも動作する
+- `src/librs`の変更
+```
+//  src/lib.rs
+
+mod front_of_house;
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+- `src/front_of_house.rs`ファイル作成
+
+```
+pub mod hosting {
+    pub fn add_to_waitlist() {}
+
+    fn seat_at_table() {}
+}
+
+mod serving {
+    fn take_order() {}
+
+    fn serve_order() {}
+
+    fn take_payment() {}
+}
+```
+- `hosting`モジュールのみ切り出してみる
+  - `src/front_of_house`ディレクトリ作成
+  - `src/front_of_house/hosting.rs`ファイル作成
+  - `src/front_of_house.rs`の`hosting`モジュールを読み込ませるように変更
+  - `src/lib.rs`の`pub use crate::front_of_house::hosting`は変更しなくても良い
+```
+// src/front_of_house.rs
+pub mod hosting;
+```
+
+```
+// src/front_of_house/hosting.rs
+pub fn add_to_waitlist() {}
+
+fn seat_at_table() {}
+```
