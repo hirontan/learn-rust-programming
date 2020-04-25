@@ -330,3 +330,142 @@ for b in "नमस्ते".bytes() {
 - プログラミング言語は、プログラマにこの複雑さをどのように提示するかについて、異なる選択をしている
   - Rustは文字列データの正しい処理をすべてのRustプログラムのデフォルト動作にすることを選択した（トレードオフ）
   - 開発ライフサイクルの後半で非ASCII文字を含むエラーを処理する必要がなくなるようにしている
+
+### 関連づけられた値を持つキーをハッシュマップに格納する
+- ハッシュマップ
+  - HashMap<K, V>型は、K型のキーとV型の値のマッピングを格納
+  - ハッシュ、マップ、オブジェクト、ハッシュテーブル、辞書、連想配列などの別の名前を使用している
+  - ベクトルのようにインデックスを使わずにデータを調べたいときに便利
+  - https://doc.rust-lang.org/std/collections/struct.HashMap.html
+
+##### 新しいハッシュマップの作成
+- `new`で空のハッシュマップを作り、`insert`で要素を追加できる
+
+```
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Yellow"), 50);
+```
+
+- ハッシュマップ
+  - データをヒープ上に保存（ベクターと同様）
+  - `String`型のキーと`i32`型の値を持つ
+  - 同じ型を持たななければならない
+
+- ハッシュマップを構築するもう一つの方法
+  - タプルのベクターに対してイテレータと`collect`メソッドを使用する
+- `HashMap<_, _>`
+  - キーと値の型のパラメーターにはアンダースコアを使い、ベクターのデータの型に基づいてハッシュマップに含まれる型を推測することができる
+```
+    use std::collections::HashMap;
+
+    let teams = vec![String::from("Blue"), String::from("Yellow")];
+    let initial_scores = vec![10, 50];
+
+    let mut scores: HashMap<_, _> =
+        teams.into_iter().zip(initial_scores.into_iter()).collect();
+```
+
+##### ハッシュマップと所有権
+- `i32`のように`Copy`トレイトを実装する型の場合、値はハッシュマップにコピーされる
+- `String`のような所有する値のため、値は移動され、ハッシュマップは値の所有者になる
+  - ハッシュマップに移動された後、挿入の呼び出しで変数は使用できなくなる
+  - 値への参照をハッシュマップに挿入すると、値はハッシュマップに移動しません
+```
+    let field_name = String::from("Favorite color");
+    let field_value = String::from("Blue");
+
+    let mut map = HashMap::new();
+    map.insert(field_name, field_value);
+```
+
+##### ハッシュマップ内の値へのアクセス
+- キーを`get`メソッドを提供することでハッシュマップから値を取得できる
+  - `get`は`Option<&V>`を返すので、結果はSomeにある
+  - ハッシュマップにそのキーの値がなければ、`get`は`None`を返す
+```
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Yellow"), 50);
+
+    let team_name = String::from("Blue");
+    let score = scores.get(&team_name);
+```
+
+- ハッシュマップ内の各キーと値のペアを、ベクトルで行うのと同様の方法で、forループを使って反復処理することができる
+```
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Yellow"), 50);
+
+    for (key, value) in &scores {
+        println!("{}: {}", key, value);
+    }
+```
+
+##### ハッシュマップの更新
+- キーと値の数は増やすことが可能
+- 各キーには一度に1つの値しか関連付けられない
+
+###### 値の上書き
+- キーと値をハッシュマップに挿入してから同じキーに異なる値を挿入する場合、そのキーに関連付けられた値は置き換えられる
+```
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Blue"), 25);
+
+    println!("{:?}", scores);
+```
+
+###### キーに値がない場合にのみ値を挿入する
+- 特定のキーが値を持っているかどうかをチェックし、持っていない場合はそのキーの値を挿入する
+  - ハッシュマップには、チェックしたいキーをパラメータとして受け取る`entry`と呼ばれる`API`がある
+  - `entry`メソッドの戻り値は、`Entry`と呼ばれる`enum`で、 「存在する」「存在しない」値を表す
+  - `Entry`の`or_insert`メソッドは、対応する`Entry`キーが存在する場合は、そのキーの値への変更可能な参照を返し、存在しない場合は、このキーの新しい値としてパラメータを挿入し、新しい値への変更可能な参照を返すように定義されている
+```
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+    scores.insert(String::from("Blue"), 10);
+
+    scores.entry(String::from("Yellow")).or_insert(50);
+    scores.entry(String::from("Blue")).or_insert(50);
+
+    println!("{:?}", scores);
+```
+
+###### 古い値に基づく値の更新
+- キーの値を検索して古い値に基づいて更新する
+  - ミュータブル参照を`count`変数に格納しているので、その値に代入するためには、まずアスタリスク (*) を使用して count を参照解除する必要がある
+```
+    use std::collections::HashMap;
+
+    let text = "hello world wonderful world";
+
+    let mut map = HashMap::new();
+
+    for word in text.split_whitespace() {
+        let count = map.entry(word).or_insert(0);
+        *count += 1;
+    }
+
+    println!("{:?}", map);
+```
+
+##### ハッシュ関数
+- デフォルトで、`HashMap`は「暗号的に強力な」ハッシュ関数を使用
+  - 利用可能な最速のハッシュアルゴリズムではないが、パフォーマンスの低下に伴うセキュリティの向上と引き換えにしている
+  - デフォルトのハッシュ関数があまりにも遅いと感じたら、別のハッシャーを指定することで別の関数に切り替えられる
+    - default: [RandomState](https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html)
