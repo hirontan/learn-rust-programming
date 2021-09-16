@@ -31,3 +31,11 @@
 - [VS Code](https://code.visualstudio.com/)
 - [Rust support for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust)
 - [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)
+
+##### settings.jsonに下記を追加
+```
+"[rust]": {
+	"editor.defaultFormatter": "rust-lang.rust",
+	"editor.formatOnSave": true
+}
+```
