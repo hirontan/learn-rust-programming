@@ -24,3 +24,10 @@
 - 未 - [20. Final Project: Building a Multithreaded Web Server](docs/FinalProjectBuildingaMultithreadedWebServer.md)
 - 未 - [21. Appendix](docs/Appendix.md)
 - [extra. modules](docs/Modules.md)
+
+## 開発環境
+
+### VS Code
+- [VS Code](https://code.visualstudio.com/)
+- [Rust support for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust)
+- [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)
