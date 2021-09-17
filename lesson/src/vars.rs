@@ -62,5 +62,11 @@ pub fn run() {
   // 配列（スタックに積まれていく）
   let a = [1, 2, 3, 4, 5];
   let aa = [0; 10];
-  println!("Array: {:?} {:?} {} {}", a, aa, a[2], a[3])
+  println!("Array: {:?} {:?} {} {}", a, aa, a[2], a[3]);
+
+  // 文字列スライス
+  let s = "helloこんにちは挨拶"; // 20bytes
+  let ss = "hello"; // 5bytes
+  println!("Stack address of s: {:p}", &s);
+  println!("Stack address of ss: {:p}", &ss);
 }
