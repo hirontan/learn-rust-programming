@@ -22,5 +22,11 @@ pub fn run() {
   let f = 3.0; // 型の推論として、デフォルトでf32が指定される
 
   println!("system size: {}", usize::BITS); // システムのサイズを確認
-  println!("Memory address: {:p}", &MAX_POINTS); // 「&」をつけることでメモリの番地を確認できる
+  println!("Memory address: {:p}", &MAX_POINTS); // 「&」をつけることでメモリの番地を確認できる（ポインタの表記は、「:p」）
+
+  // スタックに積まれる
+  let ii: i64 = 1;
+  let iii: i64 = 2;
+  println!("Stack address of ii: {:p}", &ii);
+  println!("Stack address of iii: {:p}", &iii);
 }
