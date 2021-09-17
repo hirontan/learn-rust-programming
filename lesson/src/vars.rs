@@ -21,5 +21,6 @@ pub fn run() {
   let i = 3; // 型の推論として、デフォルトでi32が指定される
   let f = 3.0; // 型の推論として、デフォルトでf32が指定される
 
-  println!("system size: {}", usize::BITS) // システムのサイズを確認
+  println!("system size: {}", usize::BITS); // システムのサイズを確認
+  println!("Memory address: {:p}", &MAX_POINTS); // 「&」をつけることでメモリの番地を確認できる
 }
