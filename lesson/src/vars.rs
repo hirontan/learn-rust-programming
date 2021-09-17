@@ -69,4 +69,7 @@ pub fn run() {
   let ss = "hello"; // 5bytes
   println!("Stack address of s: {:p}", &s);
   println!("Stack address of ss: {:p}", &ss);
+  // 先頭アドレス（ポインタ）
+  println!("Static memory address of s: {:?}", s.as_ptr());
+  println!("Static memory address of ss: {:?}", ss.as_ptr());
 }
