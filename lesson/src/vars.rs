@@ -72,4 +72,7 @@ pub fn run() {
   // 先頭アドレス（ポインタ）
   println!("Static memory address of s: {:?}", s.as_ptr());
   println!("Static memory address of ss: {:?}", ss.as_ptr());
+  // length
+  println!("Length of s: {}", s.len());
+  println!("Length of ss: {}", ss.len());
 }
