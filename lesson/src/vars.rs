@@ -29,4 +29,15 @@ pub fn run() {
   let iii: i64 = 2;
   println!("Stack address of ii: {:p}", &ii);
   println!("Stack address of iii: {:p}", &iii);
+
+  // シャドーイング
+  let y = 5;
+  println!("Stack address of y: {:p}", &y);
+
+  let y = y + 1; // bind
+  println!("Stack address of y: {:p}", &y);
+
+  let y = y * 2;
+  println!("Stack address of y: {:p}", &y);
+  println!("The Value of y: {}", y)
 }
