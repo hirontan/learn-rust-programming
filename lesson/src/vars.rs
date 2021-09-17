@@ -75,4 +75,16 @@ pub fn run() {
   // length
   println!("Length of s: {}", s.len());
   println!("Length of ss: {}", ss.len());
+
+  // String型（ヒープの領域に格納される）
+  let mut s = String::from("Hello");
+  let mut ss = String::from("Hello World");
+  println!("Stack address of s: {:p}", &s);
+  println!("Stack address of ss: {:p}", &ss);
+  println!("Static memory address of s: {:?}", s.as_ptr());
+  println!("Static memory address of ss: {:?}", ss.as_ptr());
+  println!("Length of s: {}", s.len());
+  println!("Length of ss: {}", ss.len());
+  println!("Capacity of s: {}", s.capacity());
+  println!("Capacity of ss: {}", ss.capacity());
 }
