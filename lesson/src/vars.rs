@@ -39,5 +39,12 @@ pub fn run() {
 
   let y = y * 2;
   println!("Stack address of y: {:p}", &y);
-  println!("The Value of y: {}", y)
+  println!("The Value of y: {}", y);
+
+  // 別のスコープを定義
+  {
+    let y = 0;
+    println!("The Value of y: {}", y);
+  }
+  println!("The Value of y: {}", y);
 }
