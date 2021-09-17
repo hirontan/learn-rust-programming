@@ -47,4 +47,9 @@ pub fn run() {
     println!("The Value of y: {}", y);
   }
   println!("The Value of y: {}", y);
+
+  // タプル型
+  let t = (100, 6.6, "hoge"); // 違う型を扱える
+  let (x, y, z) = t;
+  println!("The Value of y: {} {} {}", t.0, t.1, t.2);
 }
