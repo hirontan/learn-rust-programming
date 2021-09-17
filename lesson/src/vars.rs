@@ -87,4 +87,7 @@ pub fn run() {
   println!("Length of ss: {}", ss.len());
   println!("Capacity of s: {}", s.capacity());
   println!("Capacity of ss: {}", ss.capacity());
+  s.push_str("_new1");
+  ss.push_str("_new2");
+  println!("{} {}", s, ss);
 }
