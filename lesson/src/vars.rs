@@ -2,6 +2,9 @@
 pub mod sub_a;
 pub mod sub_b;
 
+// 定数
+const MAX_POINTS: u32 = 100_000;
+
 // デフォルトではプライベート
 pub fn run() {
   println!("Vars Module!");
