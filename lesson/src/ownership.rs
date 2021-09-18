@@ -7,4 +7,6 @@ pub fn run() {
   let i = 1;
   let ii = i; // Copy Traitが行われている
   println!("{} {}", i, ii);
+  println!("Stack address of i: {:p}", &i);
+  println!("Stack address of ii: {:p}", &ii);
 }
