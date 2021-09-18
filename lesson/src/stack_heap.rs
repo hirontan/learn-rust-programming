@@ -1,3 +1,11 @@
+// NodeのListのサイズが決まらない。そういった場合にBoxPointerが役立つ
+// BoxPointerは8bytesのサイズが固定されている
+enum List {
+  // Node(i32, List),
+  Node(i32, Box<List>), // Generics
+  Nil,
+}
+
 pub fn run() {
   // Stack overflow（8MのStackを超える）
   let a1: [u8; 7000000] = [1; 7000000];
