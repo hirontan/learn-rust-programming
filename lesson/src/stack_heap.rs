@@ -18,4 +18,16 @@ pub fn run() {
   v.append(&mut vvv);
   println!("{:?}", v);
   println!("{:?}", vvv);
+
+  // box pointer
+  // https://doc.rust-lang.org/book/ch15-00-smart-pointers.html
+  let t: (i64, String) = (10, String::from("hello"));
+  println!("Stack address of t: {:p}", &t);
+  println!("Heap memory address of t.1: {:?}", t.1.as_ptr());
+  println!("Length of t.1: {}", t.1.len());
+  println!("Capacity of t.1: {}", t.1.capacity());
+  let mut b = Box::new(t);
+  (*b).1 += "world";
+  println!("{} {}", b.0, b.1);
+  println!("Stack address of b: {:p}", b);
 }
