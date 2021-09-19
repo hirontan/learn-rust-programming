@@ -16,4 +16,13 @@ pub fn run() {
   println!("{} {}", sl1, sl2);
   println!("Stack address of sl1: {:p}", &sl1);
   println!("Stack address of sl2: {:p}", &sl2);
+
+  // Deep Copy
+  let s3 = String::from("hello");
+  let s4 = s3.clone();
+  println!("Stack address of s3: {:p}", &s3);
+  println!("Stack address of s4: {:p}", &s4);
+  println!("Heap memory address of s3: {:?}", s3.as_ptr());
+  println!("Heap memory address of s4: {:?}", s4.as_ptr());
+  println!("{} {}", s3, s4);
 }
