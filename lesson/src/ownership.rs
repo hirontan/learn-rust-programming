@@ -46,6 +46,11 @@ pub fn run() {
   println!("Heap memory address of s7: {:?}", s7.as_ptr());
   println!("Len of s7: {}", s7.len());
   println!("Capacity of s7: {}", s7.capacity());
+
+  // 参照
+  let s8 = String::from("hello");
+  let len = calculate_length(&s8);
+  println!("The length of len: {}", len);
 }
 
 fn take_ownership(s: String) {
@@ -59,4 +64,9 @@ fn take_ownership(s: String) {
 // 所有権で持っている値をそのまま返す
 fn take_giveback_ownership(s: String) -> String {
   s
+}
+
+// 返り値の長さ
+fn calculate_length(s: &String) -> usize {
+  s.len()
 }
