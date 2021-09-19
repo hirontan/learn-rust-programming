@@ -51,6 +51,10 @@ pub fn run() {
   let s8 = String::from("hello");
   let len = calculate_length(&s8);
   println!("The length of len: {}", len);
+
+  let mut s9 = String::from("hello");
+  change(&mut s9);
+  println!("{}", s9);
 }
 
 fn take_ownership(s: String) {
@@ -69,4 +73,8 @@ fn take_giveback_ownership(s: String) -> String {
 // 返り値の長さ
 fn calculate_length(s: &String) -> usize {
   s.len()
+}
+
+fn change(s: &mut String) {
+  s.push_str("_world");
 }
