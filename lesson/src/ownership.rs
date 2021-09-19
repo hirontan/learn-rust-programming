@@ -35,6 +35,17 @@ pub fn run() {
   take_ownership(s5);
   // 下記は所有権が移動している
   // println!("{}", s5);
+
+  let s6 = String::from("hello");
+  println!("Stack address of s6: {:p}", &s6);
+  println!("Heap memory address of s6: {:?}", s6.as_ptr());
+  println!("Len of s6: {}", s6.len());
+  println!("Capacity of s6: {}", s6.capacity());
+  let s7 = take_giveback_ownership(s6);
+  println!("Stack address of s7: {:p}", &s7);
+  println!("Heap memory address of s7: {:?}", s7.as_ptr());
+  println!("Len of s7: {}", s7.len());
+  println!("Capacity of s7: {}", s7.capacity());
 }
 
 fn take_ownership(s: String) {
@@ -43,4 +54,9 @@ fn take_ownership(s: String) {
   println!("Len of s: {}", s.len());
   println!("Capacity of s: {}", s.capacity());
   println!("{}", s);
+}
+
+// 所有権で持っている値をそのまま返す
+fn take_giveback_ownership(s: String) -> String {
+  s
 }
