@@ -28,11 +28,19 @@ pub fn run() {
 
   // 関数の戻り値として利用した場合、所有権が移動する
   let s5 = String::from("hello");
+  println!("Stack address of s5: {:p}", &s5);
+  println!("Heap memory address of s5: {:?}", s5.as_ptr());
+  println!("Len of s5: {}", s5.len());
+  println!("Capacity of s5: {}", s5.capacity());
   take_ownership(s5);
   // 下記は所有権が移動している
   // println!("{}", s5);
 }
 
 fn take_ownership(s: String) {
+  println!("Stack address of s: {:p}", &s);
+  println!("Heap memory address of s: {:?}", s.as_ptr());
+  println!("Len of s: {}", s.len());
+  println!("Capacity of s: {}", s.capacity());
   println!("{}", s);
 }
