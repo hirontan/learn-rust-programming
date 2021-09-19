@@ -68,6 +68,15 @@ pub fn run() {
   // let r1 = &s10;
   // let r2 = &mut s10;
   // println!("{} {}", r1, r2);
+
+  // mutableな参照が有効な範囲内では、所有者であっても値を読めない
+  let mut s11 = String::from("hello");
+  let r1 = &mut s11;
+  // println!("{}", s11); // <-ここが問題
+  println!("{}", r1);
+  println!("{}", s11);
+
+  // 有効範囲の関係
 }
 
 fn take_ownership(s: String) {
