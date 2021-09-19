@@ -52,9 +52,16 @@ pub fn run() {
   let len = calculate_length(&s8);
   println!("The length of len: {}", len);
 
+  // Mutableな参照
   let mut s9 = String::from("hello");
   change(&mut s9);
   println!("{}", s9);
+
+  // immutableな場合、参照は複数作成できる
+  let s10 = String::from("hello");
+  let r1 = &s10;
+  let r2 = &s10;
+  println!("{} {} {}", s10, r1, r2);
 }
 
 fn take_ownership(s: String) {
