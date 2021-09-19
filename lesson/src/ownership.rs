@@ -64,10 +64,10 @@ pub fn run() {
   println!("{} {} {}", s10, r1, r2);
 
   // immutableな参照とmutableな参照は共存できない
-  let mut s10 = String::from("hello");
-  let r1 = &s10;
-  let r2 = &mut s10;
-  println!("{} {}", r1, r2);
+  // let mut s10 = String::from("hello");
+  // let r1 = &s10;
+  // let r2 = &mut s10;
+  // println!("{} {}", r1, r2);
 }
 
 fn take_ownership(s: String) {
