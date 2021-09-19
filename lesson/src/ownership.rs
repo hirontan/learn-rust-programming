@@ -25,4 +25,14 @@ pub fn run() {
   println!("Heap memory address of s3: {:?}", s3.as_ptr());
   println!("Heap memory address of s4: {:?}", s4.as_ptr());
   println!("{} {}", s3, s4);
+
+  // 関数の戻り値として利用した場合、所有権が移動する
+  let s5 = String::from("hello");
+  take_ownership(s5);
+  // 下記は所有権が移動している
+  // println!("{}", s5);
+}
+
+fn take_ownership(s: String) {
+  println!("{}", s);
 }
