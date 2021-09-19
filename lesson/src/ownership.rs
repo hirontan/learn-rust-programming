@@ -77,6 +77,13 @@ pub fn run() {
   println!("{}", s11);
 
   // 有効範囲の関係
+  let mut s12 = String::from("hello");
+  let r1 = &s12;
+  let r2 = &s12;
+  println!("{} {}", r1, r2);
+  let r3 = &mut s12;
+  *r3 = String::from("hello_updated"); // 参照はずし
+  println!("{}", s12);
 }
 
 fn take_ownership(s: String) {
