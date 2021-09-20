@@ -73,6 +73,7 @@ pub fn run() {
   let mut s11 = String::from("hello");
   let r1 = &mut s11;
   // println!("{}", s11); // <-ここが問題
+  // Rustの場合は、コンパイルが通る限り、Dangling Pointerは発生しない
   println!("{}", r1); // Life Timeが終了するタイミング
   println!("{}", s11);
 
