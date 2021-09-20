@@ -8,6 +8,17 @@ struct PointAnother<T, U> {
   y: U,
 }
 
+// インプリメンテーション
+impl<T, U> PointAnother<T, U> {
+  // インスタンスの情報が必要なため, selfが必要
+  fn mixup<V, W>(self, other: PointAnother<V, W>) -> PointAnother<T, W> {
+    PointAnother {
+      x: self.x,
+      y: other.y,
+    }
+  }
+}
+
 pub fn run() {
   let number_list = vec![34, 50, 25, 100, 101];
 
@@ -23,6 +34,8 @@ pub fn run() {
   let p2 = Point { x: 1.0, y: 2.0 }; // xとyの型は同じであると制約がかかっているので、片方がintなど違う型はできない
   let p3 = PointAnother { x: 1, y: 2.0 }; // こちらは、両方違ったデータ型を格納可能
   let p4 = PointAnother { x: "Rust", y: 'a' };
+  let p5 = p3.mixup(p4);
+  println!("{} {}", p5.x, p5.y);
 }
 
 // Vector型で格納された数値の最大値を取得する
