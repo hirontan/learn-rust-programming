@@ -1,3 +1,13 @@
+struct Point<T> {
+  x: T,
+  y: T,
+}
+
+struct PointAnother<T, U> {
+  x: T,
+  y: U,
+}
+
 pub fn run() {
   let number_list = vec![34, 50, 25, 100, 101];
 
@@ -7,6 +17,12 @@ pub fn run() {
   let char_list = vec!['a', 'b', 'c', 'd'];
   println!("The largest of char_list: {}", largest(char_list));
   println!("The largest of number_list: {}", largest(number_list));
+
+  // 構造体
+  let p1 = Point { x: 1, y: 2 };
+  let p2 = Point { x: 1.0, y: 2.0 }; // xとyの型は同じであると制約がかかっているので、片方がintなど違う型はできない
+  let p3 = PointAnother { x: 1, y: 2.0 }; // こちらは、両方違ったデータ型を格納可能
+  let p4 = PointAnother { x: "Rust", y: 'a' };
 }
 
 // Vector型で格納された数値の最大値を取得する
