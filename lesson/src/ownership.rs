@@ -73,7 +73,7 @@ pub fn run() {
   let mut s11 = String::from("hello");
   let r1 = &mut s11;
   // println!("{}", s11); // <-ここが問題
-  println!("{}", r1);
+  println!("{}", r1); // Life Timeが終了するタイミング
   println!("{}", s11);
 
   // 有効範囲の関係
