@@ -38,6 +38,9 @@ pub fn run() {
 
   let user2 = build_user(String::from("user2@example.com"), String::from("user2"));
   println!("{:#?}", user2);
+
+  let rect = Rectangle::create(20, 20);
+  println!("{:#?}", rect);
 }
 
 fn build_user(email: String, username: String) -> User {
