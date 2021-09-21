@@ -6,8 +6,11 @@ enum OS {
 
 pub fn run() {
   let linux = OS::Linux(1991, String::from("Linus"));
+  print_os_info(linux);
   let windows = OS::Windows(1985, String::from("MicroSoft"));
+  print_os_info(windows);
   let apple = OS::Mac(2001, String::from("Apple"));
+  print_os_info(apple);
 }
 
 // OSの種類に応じて実体を切り替える
