@@ -31,3 +31,14 @@ fn get_longest<'a>(x: &'a str, y: &'a str) -> &'a str {
 //   let s = String::from("demo");
 //   &s
 // }
+
+// fn dummy2<'a>() -> &'a i32 {
+//   let x = 10;
+//   &x
+// }
+
+// 実態を返り値する
+fn dummy3() -> String {
+  let s = String::from("demo");
+  s
+}
