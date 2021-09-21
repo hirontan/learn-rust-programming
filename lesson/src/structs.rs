@@ -47,6 +47,9 @@ pub fn run() {
 
   let rect = Rectangle::create(20, 20);
   println!("{:#?}", rect);
+
+  rect.area();
+  println!("{:#?}", rect);
 }
 
 fn build_user(email: String, username: String) -> User {
