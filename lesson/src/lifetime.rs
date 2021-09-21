@@ -25,3 +25,9 @@ fn get_longest<'a>(x: &'a str, y: &'a str) -> &'a str {
     y
   }
 }
+
+// 実態が関数を抜けるとドロップされてしまう（動かないので、コメントアウト）
+// fn dummy1<'a>() -> &'a str {
+//   let s = String::from("demo");
+//   &s
+// }
