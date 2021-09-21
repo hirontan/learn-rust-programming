@@ -23,4 +23,16 @@ pub fn run() {
   };
   user1.email = String::from("test_update@example.com");
   println!("{:#?}", user1); // #をつけると見やすくなる
+
+  let user2 = build_user(String::from("user2@example.com"), String::from("user2"));
+  println!("{:#?}", user2);
+}
+
+fn build_user(email: String, username: String) -> User {
+  User {
+    username,
+    email,
+    sign_in_count: 1,
+    active: true,
+  }
 }
