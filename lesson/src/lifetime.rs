@@ -4,7 +4,8 @@ pub fn run() {
 }
 
 // 大きい方の参照を返す関数
-fn get_longest(x: &str, y: &str) -> &str {
+// どのLifetimeを扱えば良いのかわからないため、Generics利用して指示することができる（例: <'a>）
+fn get_longest<'a>(x: &'a str, y: &'a str) -> &'a str {
   if x.len() > y.len() {
     x
   } else {
