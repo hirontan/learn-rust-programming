@@ -17,6 +17,12 @@ impl Rectangle {
     // SelfがRectangleのデータ型を意味
     Self { width, height }
   }
+
+  // 面積の計算
+  // &をつけないと所有権は移動する
+  fn area(&self) {
+    println!("{}", self.width * self.height);
+  }
 }
 
 pub fn run() {
