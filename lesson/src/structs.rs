@@ -12,6 +12,13 @@ struct Rectangle {
   height: u32,
 }
 
+impl Rectangle {
+  fn create(width: u32, height: u32) -> Self {
+    // SelfがRectangleのデータ型を意味
+    Self { width, height }
+  }
+}
+
 pub fn run() {
   let user1 = User {
     username: String::from("test"),
