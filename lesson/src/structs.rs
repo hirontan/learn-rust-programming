@@ -22,5 +22,5 @@ pub fn run() {
     active: true,
   };
   user1.email = String::from("test_update@example.com");
-  println!("{:?}", user1);
+  println!("{:#?}", user1); // #をつけると見やすくなる
 }
