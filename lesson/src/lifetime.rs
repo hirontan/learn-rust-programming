@@ -3,6 +3,16 @@ pub fn run() {
   let st2 = String::from("y");
   let res1 = get_longest(&st1, &st2);
   println!("{}", res1);
+
+  // lifetimeが違う場合
+  let st3 = String::from("x");
+  let res2; // &strとなっており、型が逆算されて推論されている
+  {
+    let st4 = String::from("y");
+    res2 = get_longest(&st3, &st4);
+    println!("{}", res2);
+  }
+  // println!("{}", res2); // dangling pointerが発生する
 }
 
 // 大きい方の参照を返す関数
