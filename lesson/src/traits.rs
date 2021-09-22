@@ -30,20 +30,20 @@ struct NewsArticle {
 impl Summary for NewsArticle {
   fn summarize(&self) -> String {
     // format! : 埋め込んだ値をStringで返してくれる
-    format!("{}, by {} ({})", self.headline, self.author, self.location);
+    format!("{}, by {} ({})", self.headline, self.author, self.location)
   }
 }
 
 struct Tweet {
   username: String,
   content: String,
-  retry: bool,
+  reply: bool,
   retweet: bool,
 }
 impl Summary for Tweet {
   fn summarize(&self) -> String {
     // format! : 埋め込んだ値をStringで返してくれる
-    format!("{}: {}", self.username, self.content);
+    format!("{}: {}", self.username, self.content)
   }
 }
 
@@ -52,6 +52,25 @@ pub fn run() {
   let banana = Banana {};
   get_price(apple);
   get_price(banana);
+
+  let tweet = Tweet {
+    username: String::from("test"),
+    content: String::from("test"),
+    reply: false,
+    retweet: false,
+  };
+  println!("tweet: {}", tweet.summarize());
+
+  let article = NewsArticle {
+    headline: String::from("test"),
+    location: String::from("test"),
+    author: String::from("test"),
+    content: String::from(
+      "test \
+       test",
+    ),
+  };
+  println!("article: {}", article.summarize());
 }
 
 // priceを出力する
