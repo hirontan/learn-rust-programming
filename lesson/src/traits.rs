@@ -17,6 +17,10 @@ impl Fruits for Banana {
   }
 }
 
+trait Summary {
+  fn summarize(&self) -> String;
+}
+
 pub fn run() {
   let apple = Apple {};
   let banana = Banana {};
