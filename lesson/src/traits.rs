@@ -17,4 +17,7 @@ impl Fruits for Banana {
   }
 }
 
-pub fn run() {}
+pub fn run() {
+  let apple = Apple {};
+  let banana = Banana {};
+}
