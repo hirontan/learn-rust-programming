@@ -22,6 +22,11 @@ trait Summary {
     String::from("(read more...)")
   }
 }
+trait Message {
+  fn message(&self) -> String {
+    String::from("Message")
+  }
+}
 
 struct NewsArticle {
   headline: String,
@@ -35,6 +40,7 @@ impl Summary for NewsArticle {
   //   format!("{}, by {} ({})", self.headline, self.author, self.location)
   // }
 }
+impl Message for NewsArticle {}
 
 struct Tweet {
   username: String,
