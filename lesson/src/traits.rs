@@ -21,6 +21,19 @@ trait Summary {
   fn summarize(&self) -> String;
 }
 
+struct NewsArticle {
+  headline: String,
+  location: String,
+  author: String,
+  content: String,
+}
+impl Summary for NewsArticle {
+  fn summarize(&self) -> String {
+    // format! : 埋め込んだ値をStringで返してくれる
+    format!("{}, by {} ({})", self.headline, self.author, self.location);
+  }
+}
+
 pub fn run() {
   let apple = Apple {};
   let banana = Banana {};
