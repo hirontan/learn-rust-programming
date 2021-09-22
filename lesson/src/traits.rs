@@ -81,7 +81,7 @@ pub fn run() {
   println!("article: {}", article.summarize());
 
   notify(&article);
-  notify_another(&article);
+  notify_another(&article); // &tweetは渡せない
 }
 
 // priceを出力する
