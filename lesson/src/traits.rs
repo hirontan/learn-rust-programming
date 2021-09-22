@@ -21,3 +21,8 @@ pub fn run() {
   let apple = Apple {};
   let banana = Banana {};
 }
+
+// priceを出力する
+fn get_price<T: Fruits>(fruits: T) {
+  println!("price: {}", fruits.price());
+}
