@@ -20,6 +20,8 @@ impl Fruits for Banana {
 pub fn run() {
   let apple = Apple {};
   let banana = Banana {};
+  get_price(apple);
+  get_price(banana);
 }
 
 // priceを出力する
