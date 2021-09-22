@@ -71,6 +71,8 @@ pub fn run() {
     ),
   };
   println!("article: {}", article.summarize());
+
+  notify(&article);
 }
 
 // priceを出力する
