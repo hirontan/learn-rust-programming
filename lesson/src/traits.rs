@@ -34,6 +34,19 @@ impl Summary for NewsArticle {
   }
 }
 
+struct Tweet {
+  username: String,
+  content: String,
+  retry: bool,
+  retweet: bool,
+}
+impl Summary for Tweet {
+  fn summarize(&self) -> String {
+    // format! : 埋め込んだ値をStringで返してくれる
+    format!("{}: {}", self.username, self.content);
+  }
+}
+
 pub fn run() {
   let apple = Apple {};
   let banana = Banana {};
