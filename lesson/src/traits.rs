@@ -81,6 +81,7 @@ pub fn run() {
   println!("article: {}", article.summarize());
 
   notify(&article);
+  notify_another(&article);
 }
 
 // priceを出力する
@@ -90,4 +91,9 @@ fn get_price<T: Fruits>(fruits: T) {
 
 fn notify(item: &impl Summary) {
   println!("Breaking news! {}", item.summarize());
+}
+
+fn notify_another(item: &(impl Summary + Message)) {
+  println!("Breaking news! {}", item.summarize());
+  println!("Message: {}", item.message());
 }
