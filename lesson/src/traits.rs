@@ -77,3 +77,7 @@ pub fn run() {
 fn get_price<T: Fruits>(fruits: T) {
   println!("price: {}", fruits.price());
 }
+
+fn notify(item: &impl Summary) {
+  println!("Breaking news! {}", item.summarize());
+}
