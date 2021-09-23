@@ -30,3 +30,10 @@ fn division_result(x: f64, y: f64) -> Result<f64, String> {
     Ok(x / y)
   }
 }
+
+fn match_results(result: Result<f64, String>) {
+  match result {
+    Ok(x) => println!("Result: {:.3}", x),
+    Err(e) => println!("{}", e),
+  }
+}
