@@ -50,3 +50,10 @@ fn sum(a: &[i32]) -> Option<i32> {
   let a2 = a.get(2)?; // 「?」をつけることでOut of Indexでエラーになったときに、即時にreturn(None)してくれる
   Some(a0 + a1 + a2)
 }
+
+fn match_sum(result: Option<i32>) {
+  match result {
+    Some(x) => println!("Total: {}", x),
+    None => println!("Out of index!!"),
+  }
+}
