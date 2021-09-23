@@ -1,3 +1,4 @@
+// https://crates.io/crates/rand
 use rand::Rng;
 
 // ランダムの整数を生成
