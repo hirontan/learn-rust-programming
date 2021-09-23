@@ -21,7 +21,6 @@ mod tests {
   use super::*; // 親にアクセスする
 
   #[test]
-
   fn test_a_is_larger() {
     let a = Rectangle {
       width: 5,
@@ -32,5 +31,18 @@ mod tests {
       height: 3,
     };
     assert!(a.compare_area(&b));
+  }
+
+  #[test]
+  fn test_a_is_smaller() {
+    let a = Rectangle {
+      width: 3,
+      height: 3,
+    };
+    let b = Rectangle {
+      width: 5,
+      height: 5,
+    };
+    assert!(!(a.compare_area(&b)));
   }
 }
