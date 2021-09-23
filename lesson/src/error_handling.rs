@@ -42,3 +42,11 @@ fn match_results(result: Result<f64, String>) {
     Err(e) => println!("{}", e),
   }
 }
+
+// 存在しないインデックスにアクセスしたとき、Out of Indexでエラーになる。その回避方法
+fn sum(a: &[i32]) -> Option<i32> {
+  let a0 = a.get(0)?;
+  let a1 = a.get(1)?;
+  let a2 = a.get(2)?; // 「?」をつけることでOut of Indexでエラーになったときに、即時にreturn(None)してくれる
+  Some(a0 + a1 + a2)
+}
