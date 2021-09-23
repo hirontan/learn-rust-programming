@@ -53,4 +53,10 @@ mod tests {
   fn test_double() {
     assert_eq!(6, double_value(3));
   }
+
+  #[test]
+  fn test_contains_name() {
+    let res = greeting("rust");
+    assert!(res.contains("rust"));
+  }
 }
