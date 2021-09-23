@@ -6,6 +6,8 @@ pub fn run() {
 
   let res3 = division_result(5.0, 2.0);
   match_results(res3);
+  let res4 = division_result(5.0, 0.0);
+  match_results(res4);
 }
 
 // Option: https://doc.rust-lang.org/std/option/enum.Option.html
