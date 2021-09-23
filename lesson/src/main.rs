@@ -6,8 +6,10 @@
 // mod structs;
 // mod enums;
 // mod traits;
-mod error_handling;
+// mod error_handling;
 mod unit_test;
+
+extern crate lib_demo;
 
 fn main() {
     // println!("Hello, world!");
@@ -21,5 +23,6 @@ fn main() {
     // structs::run();
     // enums::run();
     // traits::run();
-    error_handling::run();
+    // error_handling::run();
+    lib_demo::print_random_number();
 }
