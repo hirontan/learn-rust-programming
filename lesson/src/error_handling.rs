@@ -1,6 +1,8 @@
 pub fn run() {
   let res1 = division_option(5.0, 2.0);
   match_options(res1);
+  let res2 = division_option(5.0, 0.0);
+  match_options(res2);
 }
 
 // Option: https://doc.rust-lang.org/std/option/enum.Option.html
