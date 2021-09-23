@@ -21,3 +21,12 @@ fn match_options(result: Option<f64>) {
     None => println!("Not allowed!!"),
   }
 }
+
+// Result: https://doc.rust-lang.org/std/result/enum.Result.html
+fn division_result(x: f64, y: f64) -> Result<f64, String> {
+  if y == 0.0 {
+    Err(String::from("Not allowed!!"))
+  } else {
+    Ok(x / y)
+  }
+}
