@@ -1,3 +1,6 @@
+/*
+実行: cargo test
+*/
 struct Rectangle {
   width: u32,
   height: u32,
@@ -44,5 +47,10 @@ mod tests {
       height: 5,
     };
     assert!(!(a.compare_area(&b)));
+  }
+
+  #[test]
+  fn test_double() {
+    assert_eq!(6, double_value(3));
   }
 }
