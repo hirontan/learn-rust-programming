@@ -8,6 +8,10 @@ pub fn run() {
   match_results(res3);
   let res4 = division_result(5.0, 0.0);
   match_results(res4);
+
+  let a = [0, 1, 2];
+  let res5 = sum(&a);
+  match_sum(res5);
 }
 
 // Option: https://doc.rust-lang.org/std/option/enum.Option.html
