@@ -12,6 +12,9 @@ pub fn run() {
   let a = [0, 1, 2];
   let res5 = sum(&a);
   match_sum(res5);
+  let b = [0, 1];
+  let res6 = sum(&b);
+  match_sum(res6);
 }
 
 // Option: https://doc.rust-lang.org/std/option/enum.Option.html
