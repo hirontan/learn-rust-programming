@@ -7,11 +7,13 @@
 // mod enums;
 // mod traits;
 // mod error_handling;
+mod debug;
 mod unit_test;
 
 extern crate lib_demo;
 
 fn main() {
+    // debug::run();
     // println!("Hello, world!");
     // vars::run();
     // vars::sub_a::func_a();
